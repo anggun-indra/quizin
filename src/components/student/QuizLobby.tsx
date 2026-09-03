@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Quiz } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuiz } from '@/contexts/QuizContext';
 import { 
-  Clock, 
-  BookOpen, 
-  HelpCircle, 
+  Sparkles, 
   Users, 
+  Clock, 
   Award, 
+  HelpCircle, 
   LogOut, 
-  Sparkles,
-  CheckCircle2,
-  ShieldAlert
+  CheckCircle2, 
+  ShieldCheck 
 } from 'lucide-react';
 import { Button, Tag } from 'antd';
 
@@ -24,36 +23,29 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
   const { user } = useAuth();
   const { leaveQuiz } = useQuiz();
 
-  // If the host starts the quiz (status becomes ACTIVE), auto trigger start
-  useEffect(() => {
-    if (quiz.status === 'ACTIVE') {
-      onStart();
-    }
-  }, [quiz.status, onStart]);
-
   if (!user) return null;
 
   const participants = quiz.participants || [];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 py-4 sm:py-8">
+    <div className="max-w-4xl mx-auto space-y-3 sm:space-y-6 py-2 sm:py-6">
       {/* Top Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/20">
-          <Sparkles className="w-8 h-8" />
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-6 text-center">
+        <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/20">
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-center space-x-2">
-            <span className="text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
               {quiz.subject || 'Kuis Interaktif'}
             </span>
-            <Tag color="warning" className="font-bold text-[10px]">
+            <Tag color="warning" className="font-bold text-[9px] sm:text-[10px] m-0">
               RUANG TUNGGU (LOBBY)
             </Tag>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
             {quiz.title}
           </h1>
 
@@ -63,48 +55,48 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
         </div>
 
         {/* Quiz Specs Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
-          <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-slate-400">Total Soal</div>
-            <div className="text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
-              <HelpCircle className="w-4 h-4 text-indigo-600" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200 text-center">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">Total Soal</div>
+            <div className="text-base sm:text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
+              <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
               <span>{quiz.questions.length} Butir</span>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-slate-400">Durasi</div>
-            <div className="text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
-              <Clock className="w-4 h-4 text-indigo-600" />
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">Durasi</div>
+            <div className="text-base sm:text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
               <span>
                 {quiz.settings.durationMinutes > 0 ? `${quiz.settings.durationMinutes} Menit` : 'Bebas'}
               </span>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-slate-400">Nilai KKM</div>
-            <div className="text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
-              <Award className="w-4 h-4 text-amber-500" />
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">Nilai KKM</div>
+            <div className="text-base sm:text-lg font-black text-slate-900 flex items-center justify-center space-x-1">
+              <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
               <span>{quiz.settings.passingScore} / 100</span>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-slate-400">Pembuat Kuis</div>
-            <div className="text-xs font-bold text-slate-800 truncate px-1">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">Pembuat Kuis</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-800 truncate px-1">
               {quiz.creatorName}
             </div>
           </div>
         </div>
 
         {/* Waiting Animation Indicator */}
-        <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex items-center justify-center space-x-3 text-indigo-900 text-xs font-bold">
-          <span className="relative flex h-3 w-3">
+        <div className="p-3 sm:p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-center space-x-2.5 text-indigo-900 text-xs font-bold">
+          <span className="relative flex h-3 w-3 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-600"></span>
           </span>
-          <span>Menunggu pembuat kuis (host) memulai kuis... Halaman akan otomatis berpindah.</span>
+          <span className="text-[11px] sm:text-xs">Menunggu pembuat kuis memulai kuis... Halaman akan otomatis berpindah.</span>
         </div>
 
         {/* Leave button */}
@@ -121,26 +113,26 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
       </div>
 
       {/* Participants Live Presence in Lobby */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Users className="w-4 h-4 text-indigo-600" />
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+            <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wider">
               Peserta yang Sudah Masuk ({participants.length})
             </h3>
           </div>
           <span className="text-[11px] font-bold text-slate-400">
-            Kode Room: <strong className="font-mono text-indigo-700">{quiz.code}</strong>
+            Kode: <strong className="font-mono text-indigo-700">{quiz.code}</strong>
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {participants.map((p) => {
             const isMe = p.uid === user.uid;
             return (
               <div
                 key={p.uid}
-                className={`p-2.5 rounded-xl border flex items-center space-x-2 text-xs ${
+                className={`p-2 sm:p-2.5 rounded-xl border flex items-center space-x-2 text-xs ${
                   isMe
                     ? 'border-indigo-600 bg-indigo-50/60 text-indigo-950 font-bold'
                     : 'border-slate-200 bg-slate-50 text-slate-700'
@@ -151,12 +143,12 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
                   alt=""
                   className="w-7 h-7 rounded-full border border-slate-200 bg-white flex-shrink-0"
                 />
-                <div className="overflow-hidden">
+                <div className="overflow-hidden flex-1">
                   <div className="truncate font-semibold text-xs leading-tight">
                     {p.fullName} {isMe && '(Anda)'}
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono truncate">
-                    {p.identifier}
+                    ID: {p.identifier}
                   </div>
                 </div>
               </div>

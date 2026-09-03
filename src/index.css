@@ -7,6 +7,27 @@
     @apply bg-slate-50 text-slate-900 font-sans antialiased;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Prevent auto-zoom on iOS Safari when tapping inputs */
+  @media screen and (max-width: 768px) {
+    input, textarea, select, .ant-input, .ant-input-number-input {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Modal mobile adaptation */
+@media (max-width: 640px) {
+  .ant-modal {
+    max-width: calc(100vw - 20px) !important;
+    margin: 10px auto !important;
+    top: 16px !important;
+  }
+  .ant-modal .ant-modal-content {
+    padding: 16px 14px !important;
+    border-radius: 20px !important;
   }
 }
 
@@ -21,8 +42,8 @@
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -38,7 +59,7 @@
 /* Touch friendly button active scale */
 @media (hover: none) {
   button:active, .ant-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
     transition: transform 0.1s ease;
   }
 }

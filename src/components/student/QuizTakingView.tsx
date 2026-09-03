@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   Send,
   HelpCircle,
-  Hash
+  Hash,
+  LayoutGrid
 } from 'lucide-react';
 import { Button, Input, Modal, Tag, message } from 'antd';
 
@@ -28,6 +29,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showNavGridModal, setShowNavGridModal] = useState<boolean>(false);
 
   // Local storage key for saving answers continuously
   const storageKey = `quizin_ans_${quiz.id}_${user?.uid}`;
@@ -181,7 +183,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
     return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const isTimeLow = totalDurationSeconds > 0 && secondsRemaining < 120; // less than 2 mins
+  const isTimeLow = totalDurationSeconds > 0 && secondsRemaining < 120;
   const isCurrentFlagged = currentQuestion ? answers[currentQuestion.id]?.isFlagged : false;
   const currentSelectedOptions = currentQuestion
     ? answers[currentQuestion.id]?.selectedOptionIds || []
@@ -216,66 +218,108 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4 py-3 sm:py-6">
+    <div className="max-w-5xl mx-auto space-y-3 sm:space-y-4 py-2 sm:py-6">
       {/* Top Floating Control Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center justify-between gap-3 sticky top-16 z-10 backdrop-blur-md bg-white/95">
-        <div className="flex items-center space-x-2.5 overflow-hidden">
-          <span className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
+      <div className="bg-white rounded-2xl border border-slate-200 p-2.5 sm:p-4 shadow-sm flex items-center justify-between gap-2 sticky top-14 sm:top-16 z-20 backdrop-blur-md bg-white/95">
+        <div className="flex items-center space-x-2 overflow-hidden">
+          <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
             {currentIndex + 1}
           </span>
           <div className="overflow-hidden">
             <h2 className="text-xs sm:text-sm font-black text-slate-900 truncate">
               {quiz.title}
             </h2>
-            <div className="text-[11px] text-slate-400">
-              Soal {currentIndex + 1} dari {questions.length} • {currentQuestion.points} Poin
+            <div className="text-[10px] sm:text-[11px] text-slate-400">
+              Soal {currentIndex + 1} / {questions.length} • {currentQuestion.points} Poin
             </div>
           </div>
         </div>
 
         {/* Timer & Submit Button */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
           {totalDurationSeconds > 0 && (
             <div
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl border font-mono font-black text-xs sm:text-sm transition-all ${
+              className={`flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border font-mono font-black text-xs sm:text-sm transition-all ${
                 isTimeLow
                   ? 'bg-red-50 border-red-300 text-red-600 timer-warning'
                   : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}
             >
-              <Clock className={`w-4 h-4 ${isTimeLow ? 'animate-spin' : 'text-indigo-600'}`} />
+              <Clock className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isTimeLow ? 'animate-spin' : 'text-indigo-600'}`} />
               <span>{formatTime(secondsRemaining)}</span>
             </div>
           )}
+
+          {/* Mobile Grid Trigger Button */}
+          <Button
+            size="middle"
+            onClick={() => setShowNavGridModal(true)}
+            className="lg:hidden h-8 px-2 rounded-xl text-xs font-bold border-slate-200 flex items-center justify-center text-slate-600"
+            title="Daftar Nomor Soal"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+          </Button>
 
           <Button
             type="primary"
             size="middle"
             onClick={() => setIsSubmitModalOpen(true)}
-            className="rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center space-x-1.5 shadow-sm"
+            className="h-8 sm:h-9 px-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center space-x-1 shadow-sm"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Kumpulkan Kuis</span>
-            <span className="sm:hidden">Selesai</span>
+            <span className="hidden sm:inline">Kumpulkan</span>
+            <span className="sm:hidden text-[11px]">Selesai</span>
           </Button>
         </div>
       </div>
 
+      {/* Mobile Horizontal Quick Navigation Strip */}
+      <div className="lg:hidden bg-white rounded-2xl border border-slate-200 p-2 shadow-sm overflow-x-auto no-scrollbar flex items-center space-x-1.5">
+        {questions.map((q, idx) => {
+          const ans = answers[q.id];
+          const isAnswered =
+            (ans?.selectedOptionIds && ans.selectedOptionIds.length > 0) ||
+            (ans?.textAnswer && ans.textAnswer.trim().length > 0);
+          const isFlagged = ans?.isFlagged;
+          const isCurrent = idx === currentIndex;
+
+          let badgeColor = 'bg-slate-100 text-slate-700 border-slate-200';
+          if (isFlagged) {
+            badgeColor = 'bg-amber-500 text-white border-amber-600';
+          } else if (isAnswered) {
+            badgeColor = 'bg-emerald-600 text-white border-emerald-700';
+          }
+
+          return (
+            <button
+              key={q.id}
+              type="button"
+              onClick={() => setCurrentIndex(idx)}
+              className={`w-8 h-8 rounded-xl text-xs font-bold border flex-shrink-0 flex items-center justify-center transition-all ${badgeColor} ${
+                isCurrent ? 'ring-2 ring-indigo-600 ring-offset-1 font-black scale-105' : ''
+              }`}
+            >
+              {idx + 1}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Main Grid: Question Area (8 cols) + Nav Grid (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Left: Question Canvas (8 cols) */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="lg:col-span-8 space-y-3 sm:space-y-4">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-sm space-y-4 sm:space-y-6">
             {/* Question Header & Type Tag */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center space-x-2">
-                <Tag color="purple" className="font-bold text-[10px]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div className="flex items-center space-x-1.5 sm:space-x-2">
+                <Tag color="purple" className="font-bold text-[9px] sm:text-[10px] m-0">
                   {currentQuestion.type === 'SINGLE_CHOICE' && 'PILIHAN GANDA'}
-                  {currentQuestion.type === 'MULTIPLE_CHOICE' && 'PILIHAN KOMPLEKS (BISA LEBIH DARI 1)'}
+                  {currentQuestion.type === 'MULTIPLE_CHOICE' && 'PILIHAN KOMPLEKS (MULTI)'}
                   {currentQuestion.type === 'TRUE_FALSE' && 'BENAR / SALAH'}
                   {currentQuestion.type === 'SHORT_ANSWER' && 'ISIAN SINGKAT'}
                 </Tag>
-                <span className="text-xs font-bold text-slate-400">
+                <span className="text-[11px] font-bold text-slate-400">
                   {currentQuestion.points} Poin
                 </span>
               </div>
@@ -284,14 +328,19 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
               <button
                 type="button"
                 onClick={handleToggleFlag}
-                className={`flex items-center space-x-1.5 px-3 py-1 rounded-xl text-xs font-bold border transition-colors ${
+                className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 rounded-xl text-[11px] font-bold border transition-colors flex-shrink-0 ${
                   isCurrentFlagged
                     ? 'bg-amber-500 text-white border-amber-600 shadow-sm'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                 }`}
               >
                 <Bookmark className="w-3.5 h-3.5" />
-                <span>{isCurrentFlagged ? 'Ragu-ragu (Ditandai)' : 'Tandai Ragu-ragu'}</span>
+                <span className="hidden sm:inline">
+                  {isCurrentFlagged ? 'Ragu-ragu (Ditandai)' : 'Tandai Ragu-ragu'}
+                </span>
+                <span className="sm:hidden">
+                  {isCurrentFlagged ? 'Ragu' : 'Tandai Ragu'}
+                </span>
               </button>
             </div>
 
@@ -302,7 +351,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
 
             {/* Options List */}
             {currentQuestion.type !== 'SHORT_ANSWER' ? (
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 sm:space-y-3 pt-1">
                 {currentQuestion.options.map((opt, optIdx) => {
                   const isSelected = currentSelectedOptions.includes(opt.id);
                   const letter = String.fromCharCode(65 + optIdx);
@@ -311,14 +360,14 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
                     <div
                       key={opt.id}
                       onClick={() => handleSelectOption(opt.id)}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center space-x-3.5 ${
+                      className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all flex items-center space-x-3 min-h-[48px] ${
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50/70 shadow-sm'
+                          ? 'border-indigo-600 bg-indigo-50/80 shadow-sm'
                           : 'border-slate-200 hover:border-indigo-300 bg-white'
                       }`}
                     >
                       <div
-                        className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition-colors flex-shrink-0 ${
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl font-bold text-xs flex items-center justify-center transition-colors flex-shrink-0 ${
                           isSelected
                             ? 'bg-indigo-600 text-white shadow-sm'
                             : 'bg-slate-100 text-slate-700'
@@ -327,12 +376,12 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
                         {letter}
                       </div>
 
-                      <span className="text-xs sm:text-sm font-medium text-slate-800 flex-1 select-none">
+                      <span className="text-xs sm:text-sm font-medium text-slate-800 flex-1 select-none leading-snug">
                         {opt.text}
                       </span>
 
                       {isSelected && (
-                        <CheckCircle2 className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 flex-shrink-0" />
                       )}
                     </div>
                   );
@@ -349,18 +398,18 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
                   value={currentTextAnswer}
                   onChange={(e) => handleTextAnswerChange(e.target.value)}
                   placeholder="Ketik jawaban singkat di sini..."
-                  className="rounded-2xl font-mono text-sm p-3.5 border-2 border-slate-200 focus:border-indigo-600"
+                  className="rounded-xl sm:rounded-2xl font-mono text-sm p-3 border-2 border-slate-200 focus:border-indigo-600"
                 />
               </div>
             )}
 
             {/* Bottom Navigation Buttons */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
               <Button
                 size="large"
                 disabled={currentIndex === 0}
                 onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-                className="rounded-xl font-bold text-xs flex items-center space-x-1"
+                className="h-10 sm:h-11 px-3 sm:px-4 rounded-xl font-bold text-xs flex items-center space-x-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Sebelumnya</span>
@@ -371,7 +420,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
                   type="primary"
                   size="large"
                   onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-                  className="rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center space-x-1"
+                  className="h-10 sm:h-11 px-4 sm:px-5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center space-x-1 shadow-sm"
                 >
                   <span>Selanjutnya</span>
                   <ChevronRight className="w-4 h-4" />
@@ -381,18 +430,18 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
                   type="primary"
                   size="large"
                   onClick={() => setIsSubmitModalOpen(true)}
-                  className="rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white flex items-center space-x-1.5 shadow-sm"
+                  className="h-10 sm:h-11 px-4 sm:px-5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white flex items-center space-x-1.5 shadow-sm"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Selesai & Kumpulkan</span>
+                  <span>Kumpulkan Jawaban</span>
                 </Button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Right: Question Navigation Grid (4 cols) */}
-        <div className="lg:col-span-4 space-y-4">
+        {/* Right: Question Navigation Grid (Desktop View) */}
+        <div className="hidden lg:block lg:col-span-4 space-y-4">
           <QuestionNavGrid
             questions={questions}
             currentIndex={currentIndex}
@@ -402,22 +451,44 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
         </div>
       </div>
 
+      {/* Mobile Drawer / Modal for Question Navigation Grid */}
+      <Modal
+        open={showNavGridModal}
+        footer={null}
+        onCancel={() => setShowNavGridModal(false)}
+        centered
+        width={400}
+        className="mobile-nav-modal"
+      >
+        <div className="pt-2">
+          <QuestionNavGrid
+            questions={questions}
+            currentIndex={currentIndex}
+            answers={answers}
+            onSelectIndex={(idx) => {
+              setCurrentIndex(idx);
+              setShowNavGridModal(false);
+            }}
+          />
+        </div>
+      </Modal>
+
       {/* Submission Confirmation Modal */}
       <Modal
         open={isSubmitModalOpen}
         footer={null}
         onCancel={() => setIsSubmitModalOpen(false)}
         centered
-        width={460}
+        width={440}
         className="confirm-submit-modal"
       >
-        <div className="pt-2 pb-1 space-y-5 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 mx-auto flex items-center justify-center">
-            <CheckCircle2 className="w-7 h-7" />
+        <div className="pt-2 pb-1 space-y-4 sm:space-y-5 text-center">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 mx-auto flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
 
           <div className="space-y-1">
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
               Kumpulkan Jawaban Kuis?
             </h2>
             <p className="text-xs text-slate-500 max-w-xs mx-auto">
@@ -426,7 +497,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
           </div>
 
           {/* Quick Summary Box */}
-          <div className="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center text-xs">
+          <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200 text-center text-xs">
             <div className="p-2 rounded-xl bg-white border border-slate-100">
               <div className="text-slate-400 text-[10px] uppercase font-bold">Terjawab</div>
               <div className="text-emerald-600 font-black text-base mt-0.5">
@@ -448,9 +519,9 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
           </div>
 
           {unansweredCount > 0 && (
-            <div className="flex items-center justify-center space-x-1.5 text-xs text-amber-600 font-semibold">
+            <div className="flex items-center justify-center space-x-1.5 text-xs text-amber-600 font-semibold px-2">
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              <span>Masih ada {unansweredCount} soal yang belum Anda jawab!</span>
+              <span>Masih ada {unansweredCount} nomor yang belum diisi!</span>
             </div>
           )}
 
@@ -461,7 +532,7 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
               size="large"
               loading={isSubmitting}
               onClick={doSubmit}
-              className="w-full h-12 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/20"
+              className="w-full h-11 sm:h-12 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/20"
             >
               <Send className="w-4 h-4" />
               <span>Ya, Kumpulkan Sekarang</span>
@@ -469,9 +540,9 @@ export const QuizTakingView: React.FC<QuizTakingViewProps> = ({ quiz, onFinished
             <Button
               size="large"
               onClick={() => setIsSubmitModalOpen(false)}
-              className="w-full h-11 rounded-xl font-bold text-xs border-slate-200 text-slate-600 hover:text-slate-900"
+              className="w-full h-10 sm:h-11 rounded-xl font-bold text-xs border-slate-200 text-slate-600 hover:text-slate-900"
             >
-              Lanjut Mengerjakan Soal
+              Lanjut Mengerjakan
             </Button>
           </div>
         </div>

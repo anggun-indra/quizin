@@ -178,7 +178,6 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
 
   // Save all questions to Firestore
   const handleSave = async () => {
-    // Validate empty question texts
     for (let i = 0; i < questions.length; i++) {
       if (!questions[i].text.trim()) {
         message.error(`Soal nomor ${i + 1} belum memiliki teks pertanyaan.`);
@@ -209,10 +208,10 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
   const totalPoints = questions.reduce((sum, q) => sum + (q.points || 10), 0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Top Action Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center space-x-3">
+      <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center space-x-2.5">
           <Button
             size="middle"
             onClick={onBack}
@@ -220,27 +219,27 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
           >
             ← Kembali
           </Button>
-          <div>
-            <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-              Edit Soal Kuis: {quiz.title}
+          <div className="overflow-hidden">
+            <h2 className="text-sm sm:text-base font-black text-slate-900 leading-tight truncate">
+              Edit Soal: {quiz.title}
             </h2>
-            <div className="flex items-center space-x-2 text-xs text-slate-500 mt-0.5">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 text-[11px] sm:text-xs text-slate-500 mt-0.5">
               <span>{questions.length} Soal</span>
               <span>•</span>
-              <span className="font-bold text-indigo-700">Total {totalPoints} Poin</span>
+              <span className="font-bold text-indigo-700">{totalPoints} Poin</span>
               <span>•</span>
-              <Tag color="blue">{quiz.code}</Tag>
+              <Tag color="blue" className="text-[10px] m-0">{quiz.code}</Tag>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 self-end sm:self-auto w-full sm:w-auto">
           <Button
             type="primary"
             size="middle"
             loading={isSaving}
             onClick={handleSave}
-            className="rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center space-x-1.5 shadow-sm"
+            className="w-full sm:w-auto h-9 sm:h-10 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center space-x-1.5 shadow-sm"
           >
             <Save className="w-3.5 h-3.5" />
             <span>Simpan Perubahan Soal</span>
@@ -248,10 +247,41 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
         </div>
       </div>
 
-      {/* Main Split View: Left list / Right editor */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left Side: Questions List (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 h-fit max-h-[80vh] flex flex-col">
+      {/* Mobile Horizontal Question Strip */}
+      <div className="lg:hidden bg-white rounded-2xl border border-slate-200 p-2 shadow-sm overflow-x-auto no-scrollbar flex items-center space-x-1.5">
+        {questions.map((q, idx) => {
+          const isSelected = idx === selectedQuestionIndex;
+          return (
+            <button
+              key={q.id || idx}
+              type="button"
+              onClick={() => setSelectedQuestionIndex(idx)}
+              className={`h-8 px-2.5 rounded-xl text-xs font-bold border flex-shrink-0 flex items-center justify-center space-x-1 transition-all ${
+                isSelected
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              <span>#{idx + 1}</span>
+            </button>
+          );
+        })}
+
+        <Button
+          type="dashed"
+          size="small"
+          onClick={() => handleAddQuestion('SINGLE_CHOICE')}
+          className="h-8 rounded-xl text-xs font-bold text-indigo-600 flex-shrink-0"
+        >
+          <Plus className="w-3 h-3 mr-1" />
+          Tambah
+        </Button>
+      </div>
+
+      {/* Main Split View: Left list (Desktop) / Right editor */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+        {/* Left Side: Questions List (Desktop only: 4 cols) */}
+        <div className="hidden lg:flex lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 h-fit max-h-[80vh] flex-col">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-slate-700">
               Daftar Soal ({questions.length})
@@ -351,17 +381,17 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
           </div>
         </div>
 
-        {/* Right Side: Question Editor (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
+        {/* Right Side: Question Editor (12 cols mobile, 8 cols desktop) */}
+        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
           {activeQuestion ? (
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               {/* Question Header Form */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-black text-slate-900">
-                    Soal Nomor #{selectedQuestionIndex + 1}
+                    Nomor #{selectedQuestionIndex + 1}
                   </span>
-                  <Tag color="purple">
+                  <Tag color="purple" className="text-[10px] m-0 font-bold">
                     {activeQuestion.type === 'SINGLE_CHOICE' && 'Pilihan Ganda'}
                     {activeQuestion.type === 'MULTIPLE_CHOICE' && 'Pilihan Kompleks (Multi)'}
                     {activeQuestion.type === 'TRUE_FALSE' && 'Benar / Salah'}
@@ -369,16 +399,16 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                   </Tag>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1.5">
-                    <span className="text-xs font-bold text-slate-600">Bobot Poin:</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-xs font-bold text-slate-600">Poin:</span>
                     <InputNumber
                       min={1}
                       max={100}
                       value={activeQuestion.points}
                       onChange={(val) => updateActiveQuestion({ points: val || 10 })}
                       size="middle"
-                      className="w-20 rounded-xl font-bold text-xs"
+                      className="w-16 sm:w-20 rounded-xl font-bold text-xs"
                     />
                   </div>
 
@@ -403,7 +433,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                         correctAnswers: nextCorrect,
                       });
                     }}
-                    className="w-40"
+                    className="w-36 sm:w-40"
                     options={[
                       { value: 'SINGLE_CHOICE', label: 'Pilihan Ganda' },
                       { value: 'MULTIPLE_CHOICE', label: 'Pilihan Kompleks' },
@@ -420,12 +450,22 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                     <Copy className="w-3 h-3 mr-1" />
                     Duplikat
                   </Button>
+
+                  {/* Delete button on mobile */}
+                  <Button
+                    danger
+                    size="small"
+                    onClick={() => handleDeleteQuestion(selectedQuestionIndex)}
+                    className="rounded-lg text-xs font-semibold flex items-center lg:hidden"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
                 </div>
               </div>
 
               {/* Question Textarea */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center">
                   <FileQuestion className="w-3.5 h-3.5 mr-1 text-indigo-600" />
                   Pertanyaan / Soal <span className="text-red-500 ml-0.5">*</span>
                 </label>
@@ -440,11 +480,11 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
 
               {/* Options Section */}
               {activeQuestion.type !== 'SHORT_ANSWER' ? (
-                <div className="space-y-3">
+                <div className="space-y-2.5 sm:space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="block text-xs font-bold text-slate-700 flex items-center">
                       <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-                      Pilihan Jawaban (Klik lingkaran/centang untuk menandai KUNCI JAWABAN)
+                      Pilihan Jawaban (Klik huruf untuk kunci)
                     </label>
                     {activeQuestion.type !== 'TRUE_FALSE' && (
                       <Button
@@ -453,7 +493,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                         onClick={handleAddOption}
                         className="rounded-lg text-xs font-bold text-indigo-600"
                       >
-                        + Tambah Opsi
+                        + Opsi
                       </Button>
                     )}
                   </div>
@@ -464,7 +504,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                       return (
                         <div
                           key={opt.id}
-                          className={`flex items-center space-x-2.5 p-2.5 rounded-xl border transition-all ${
+                          className={`flex items-center space-x-2 p-2 sm:p-2.5 rounded-xl border transition-all ${
                             isCorrect
                               ? 'border-emerald-500 bg-emerald-50/50'
                               : 'border-slate-200 bg-white'
@@ -492,7 +532,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                           />
 
                           {isCorrect && (
-                            <Tag color="green" className="font-bold text-[10px] m-0">
+                            <Tag color="green" className="font-bold text-[9px] m-0 flex-shrink-0">
                               KUNCI
                             </Tag>
                           )}
@@ -501,7 +541,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                             <button
                               type="button"
                               onClick={() => handleDeleteOption(opt.id)}
-                              className="text-slate-400 hover:text-red-500 p-1"
+                              className="text-slate-400 hover:text-red-500 p-1 flex-shrink-0"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -513,9 +553,9 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                 </div>
               ) : (
                 /* Short Answer acceptable answers */
-                <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="space-y-2 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200">
                   <label className="block text-xs font-bold text-slate-700">
-                    Kunci Jawaban Teks (Jawaban Benar yang Diterima, pisahkan dengan koma):
+                    Kunci Jawaban Teks (Pisahkan dengan koma):
                   </label>
                   <Input
                     value={activeQuestion.correctAnswers.join(', ')}
@@ -527,10 +567,10 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
                           .filter(Boolean),
                       })
                     }
-                    placeholder="Contoh: extends, inherits, pewarisan"
+                    placeholder="Contoh: https, enkripsi, ssl"
                     className="rounded-xl text-xs font-mono font-bold"
                   />
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[10px] text-slate-400">
                     *Pengecekan tidak sensitif huruf besar/kecil (case-insensitive).
                   </p>
                 </div>

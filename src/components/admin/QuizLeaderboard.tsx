@@ -145,7 +145,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
 
         {/* Responsive Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
+          <table className="w-full text-left text-xs border-collapse min-w-[640px]">
             <thead>
               <tr className="border-b border-slate-200 text-slate-400 uppercase text-[10px] font-black tracking-wider bg-slate-50/50">
                 <th className="py-3 px-3 text-center">Rank</th>

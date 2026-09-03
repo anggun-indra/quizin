@@ -48,7 +48,6 @@ export const Dashboard: React.FC = () => {
     if (codeParam && user) {
       joinQuizByCode(codeParam, user).then((res) => {
         if (res.success && res.quiz) {
-          // Clear query param from address bar without reloading
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       });
@@ -73,38 +72,38 @@ export const Dashboard: React.FC = () => {
     // 1. Admin / Creator View
     if (isCreator) {
       return (
-        <div className="min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto space-y-4">
-            {/* Breadcrumb / Back button */}
-            <div className="flex items-center justify-between">
+        <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] bg-slate-100 py-3 sm:py-6 px-3 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto space-y-3 sm:space-y-4">
+            {/* Breadcrumb / Back button + Responsive Switcher */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   selectQuiz(null);
                   setAdminViewMode('monitor');
                 }}
-                className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center space-x-1"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center space-x-1 self-start"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Kembali ke Semua Kuis</span>
+                <span>Semua Kuis</span>
               </button>
 
-              <div className="flex items-center space-x-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm text-xs font-bold">
+              <div className="flex items-center space-x-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm text-xs font-bold overflow-x-auto no-scrollbar w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setAdminViewMode('monitor')}
-                  className={`px-3 py-1 rounded-lg transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors flex-1 sm:flex-initial text-center ${
                     adminViewMode === 'monitor'
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Ruang Pantau (Live)
+                  Ruang Pantau
                 </button>
                 <button
                   type="button"
                   onClick={() => setAdminViewMode('editor')}
-                  className={`px-3 py-1 rounded-lg transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors flex-1 sm:flex-initial text-center ${
                     adminViewMode === 'editor'
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
@@ -115,13 +114,13 @@ export const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAdminViewMode('leaderboard')}
-                  className={`px-3 py-1 rounded-lg transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors flex-1 sm:flex-initial text-center ${
                     adminViewMode === 'leaderboard'
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Papan Nilai (Rekap)
+                  Papan Nilai
                 </button>
               </div>
             </div>
@@ -154,7 +153,7 @@ export const Dashboard: React.FC = () => {
     // If student has already submitted, show results
     if (isSubmitted || activeQuiz.status === 'ENDED') {
       return (
-        <div className="min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
+        <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] bg-slate-100 py-3 sm:py-6 px-3 sm:px-6 lg:px-8">
           <QuizResultView
             quiz={activeQuiz}
             onBackToDashboard={() => selectQuiz(null)}
@@ -166,7 +165,7 @@ export const Dashboard: React.FC = () => {
     // If quiz is WAITING, show Lobby
     if (activeQuiz.status === 'WAITING') {
       return (
-        <div className="min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
+        <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] bg-slate-100 py-3 sm:py-6 px-3 sm:px-6 lg:px-8">
           <QuizLobby
             quiz={activeQuiz}
             onStart={async () => {
@@ -180,7 +179,7 @@ export const Dashboard: React.FC = () => {
 
     // If quiz is ACTIVE, show Taking View
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
+      <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] bg-slate-100 py-3 sm:py-6 px-3 sm:px-6 lg:px-8">
         <QuizTakingView
           quiz={activeQuiz}
           onFinished={() => {
@@ -193,28 +192,28 @@ export const Dashboard: React.FC = () => {
 
   // If no active quiz, show main dashboard welcome & quiz selector
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
+    <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] bg-slate-100 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-5 sm:space-y-8">
         {/* Welcome Header */}
-        <div className="text-center space-y-2 py-2 sm:py-4">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-1">
+        <div className="text-center space-y-1.5 sm:space-y-2 py-1 sm:py-3">
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-0.5">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>NIM: {user.identifier || 'Belum Dilengkapi'}</span>
+            <span>ID: {user.identifier || 'Belum Diset'}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Selamat Datang, {user.fullName}!
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
-            Buat sesi kuis interaktif baru untuk peserta atau masukkan kode akses kuis untuk mulai mengerjakan soal dan melihat nilai.
+          <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto px-2">
+            Buat kuis interaktif baru atau masukkan kode akses kuis untuk mulai mengerjakan soal dan melihat nilai secara langsung.
           </p>
         </div>
 
         {/* Two Main Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-6 max-w-3xl mx-auto">
           {/* Card 1: Create Quiz */}
-          <div className="bg-white rounded-3xl border border-slate-300 p-6 sm:p-8 text-center space-y-4 shadow-sm hover:border-indigo-600 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 mx-auto flex items-center justify-center font-bold">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-300 p-5 sm:p-8 text-center space-y-3.5 sm:space-y-4 shadow-sm hover:border-indigo-600 transition-all flex flex-col justify-between">
+            <div className="space-y-2.5 sm:space-y-3">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 mx-auto flex items-center justify-center font-bold">
                 <Plus className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <h2 className="text-lg sm:text-xl font-black text-slate-900">
@@ -228,7 +227,7 @@ export const Dashboard: React.FC = () => {
               type="primary"
               size="large"
               onClick={() => setIsCreateOpen(true)}
-              className="w-full h-12 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 border-0 flex items-center justify-center space-x-2 text-white shadow-sm"
+              className="w-full h-11 sm:h-12 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 border-0 flex items-center justify-center space-x-2 text-white shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>Buat Kuis Baru Sekarang</span>
@@ -236,9 +235,9 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Card 2: Join Quiz */}
-          <div className="bg-white rounded-3xl border border-slate-300 p-6 sm:p-8 text-center space-y-4 shadow-sm hover:border-slate-600 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 text-slate-700 mx-auto flex items-center justify-center font-bold">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-300 p-5 sm:p-8 text-center space-y-3.5 sm:space-y-4 shadow-sm hover:border-slate-600 transition-all flex flex-col justify-between">
+            <div className="space-y-2.5 sm:space-y-3">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 text-slate-700 mx-auto flex items-center justify-center font-bold">
                 <LogIn className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <h2 className="text-lg sm:text-xl font-black text-slate-900">
@@ -251,7 +250,7 @@ export const Dashboard: React.FC = () => {
             <Button
               size="large"
               onClick={() => setIsJoinOpen(true)}
-              className="w-full h-12 rounded-xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
+              className="w-full h-11 sm:h-12 rounded-xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
             >
               <LogIn className="w-4 h-4" />
               <span>Gabung ke Kuis</span>
@@ -261,7 +260,7 @@ export const Dashboard: React.FC = () => {
 
         {/* List of My Quizzes */}
         {myQuizzes.length > 0 && (
-          <div className="max-w-4xl mx-auto pt-4 space-y-4">
+          <div className="max-w-4xl mx-auto pt-2 sm:pt-4 space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wider flex items-center space-x-2">
                 <BookOpen className="w-4 h-4 text-indigo-600" />
@@ -269,7 +268,7 @@ export const Dashboard: React.FC = () => {
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {myQuizzes.map((q) => {
                 const isCreator = q.creatorUid === user.uid;
                 const myParticipant = q.participants.find((p) => p.uid === user.uid);
@@ -279,7 +278,7 @@ export const Dashboard: React.FC = () => {
                   <div
                     key={q.id}
                     onClick={() => selectQuiz(q)}
-                    className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-600 cursor-pointer transition-all shadow-sm flex flex-col justify-between space-y-3 group"
+                    className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-600 cursor-pointer transition-all shadow-sm flex flex-col justify-between space-y-3 group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -293,8 +292,8 @@ export const Dashboard: React.FC = () => {
                           }
                           className="font-bold text-[9px] m-0"
                         >
-                          {q.status === 'ACTIVE' && 'SEDANG BERLANGSUNG'}
-                          {q.status === 'WAITING' && 'MENUNGGU PESERTA'}
+                          {q.status === 'ACTIVE' && 'BERLANGSUNG'}
+                          {q.status === 'WAITING' && 'LOBBY BUKA'}
                           {q.status === 'ENDED' && 'SELESAI'}
                           {q.status === 'DRAFT' && 'DRAFT'}
                         </Tag>
@@ -308,7 +307,7 @@ export const Dashboard: React.FC = () => {
                         {q.title}
                       </h4>
 
-                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
+                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
                         {q.subject || 'Topik Umum'}
                       </p>
                     </div>
@@ -332,7 +331,7 @@ export const Dashboard: React.FC = () => {
                         </Tag>
                       ) : isDone ? (
                         <Tag color="green" className="font-black text-[10px] m-0">
-                          NILAI: {myParticipant?.percentage}/100
+                          {myParticipant?.percentage}/100
                         </Tag>
                       ) : (
                         <span className="text-indigo-600 font-bold text-[11px] flex items-center group-hover:translate-x-0.5 transition-transform">

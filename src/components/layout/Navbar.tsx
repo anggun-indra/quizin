@@ -8,8 +8,6 @@ import {
   Plus, 
   LogIn, 
   Edit3, 
-  HelpCircle,
-  Award,
   BookOpen
 } from 'lucide-react';
 import { Button, Dropdown, MenuProps } from 'antd';
@@ -148,41 +146,41 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Left: Brand Logo & Title */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
               <button
                 type="button"
                 onClick={() => selectQuiz(null)}
-                className="flex items-center space-x-2 text-left focus:outline-none group"
+                className="flex items-center space-x-2 text-left focus:outline-none group flex-shrink-0"
               >
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform">
-                  <Sparkles className="w-5 h-5" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div className="flex items-center space-x-1.5">
+                  <div className="flex items-center space-x-1 sm:space-x-1.5">
                     <span className="text-base sm:text-lg font-black tracking-tight text-slate-900">
                       QuizIn
                     </span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
                       Pro
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-400 font-medium hidden sm:block">
+                  <div className="text-[10px] text-slate-400 font-medium hidden md:block">
                     Platform Kuis Realtime Interaktif
                   </div>
                 </div>
               </button>
 
-              {/* Active Quiz Selector Dropdown */}
+              {/* Active Quiz Selector Dropdown (Desktop & Tablet) */}
               <Dropdown menu={{ items: quizMenuItems }} trigger={['click']} placement="bottomLeft">
                 <button
                   type="button"
-                  className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors ml-2"
+                  className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors ml-1 sm:ml-2"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
-                  <span className="max-w-[150px] truncate">
+                  <span className="max-w-[120px] lg:max-w-[180px] truncate">
                     {activeQuiz ? activeQuiz.title : 'Pilih Kuis...'}
                   </span>
                   <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -191,23 +189,23 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Right: Actions & Profile */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* Quick Actions (Desktop) */}
+            <div className="flex items-center space-x-1.5 sm:space-x-2.5">
+              {/* Quick Actions (Mobile Icon, Desktop Text) */}
               <Button
                 type="dashed"
-                size="middle"
                 onClick={() => setIsJoinQuizOpen(true)}
-                className="rounded-xl font-bold text-xs flex items-center space-x-1 text-slate-700 border-slate-300 hover:border-slate-400"
+                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 text-slate-700 border-slate-300 hover:border-slate-400"
+                title="Gabung Kuis"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Gabung Kuis</span>
+                <span className="hidden sm:inline">Gabung</span>
               </Button>
 
               <Button
                 type="primary"
-                size="middle"
                 onClick={() => setIsCreateQuizOpen(true)}
-                className="rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 border-0 flex items-center space-x-1 text-white shadow-sm"
+                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 border-0 flex items-center justify-center space-x-1 text-white shadow-sm"
+                title="Buat Kuis"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Buat Kuis</span>
@@ -218,19 +216,19 @@ export const Navbar: React.FC = () => {
                 <Dropdown menu={{ items: profileMenuItems }} trigger={['click']} placement="bottomRight">
                   <button
                     type="button"
-                    className="flex items-center space-x-2 pl-2 sm:pl-3 py-1 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none border border-transparent hover:border-slate-200"
+                    className="flex items-center space-x-1.5 p-1 sm:px-2 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none"
                   >
                     <img
                       src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`}
                       alt=""
-                      className="w-8 h-8 rounded-full border border-slate-200 bg-white"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-200 bg-white flex-shrink-0"
                     />
                     <div className="hidden lg:block text-left">
-                      <div className="text-xs font-bold text-slate-800 truncate max-w-[120px]">
+                      <div className="text-xs font-bold text-slate-800 truncate max-w-[110px]">
                         {user.fullName}
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        {user.identifier ? `ID: ${user.identifier}` : 'Set Identitas'}
+                        {user.identifier ? `ID: ${user.identifier}` : 'Set ID'}
                       </div>
                     </div>
                     <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:block" />

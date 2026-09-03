@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import { Quiz, QuizStatus } from '@/types';
+import { Quiz, QuizParticipant, QuizStatus } from '@/types';
 import { useQuiz } from '@/contexts/QuizContext';
-import { ShareQuizModal } from '@/components/modals/ShareQuizModal';
 import { 
+  Users, 
   Play, 
   Pause, 
-  CheckCircle, 
-  Users, 
-  Share2, 
-  Settings, 
-  Trophy, 
-  FileEdit, 
   RotateCcw, 
   Copy, 
   Check, 
-  UserMinus,
-  Sparkles,
-  Clock,
-  ExternalLink
+  Share2, 
+  Clock, 
+  Award, 
+  HelpCircle,
+  FileEdit,
+  UserX,
+  ExternalLink,
+  ChevronRight,
+  Search,
+  Sparkles
 } from 'lucide-react';
-import { Button, Tag, Popconfirm, message } from 'antd';
+import { Button, Tag, Popconfirm, message, Tooltip, Input } from 'antd';
+import { ShareQuizModal } from '@/components/modals/ShareQuizModal';
 
 interface QuizLiveMonitorProps {
   quiz: Quiz;
@@ -33,19 +34,15 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
   onViewLeaderboard,
 }) => {
   const { updateQuizStatus, kickParticipant, resetQuizParticipants } = useQuiz();
-  const [isShareOpen, setIsShareOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [statusLoading, setStatusLoading] = useState(false);
-
-  const participants = quiz.participants || [];
-  const submittedCount = participants.filter((p) => p.status === 'SUBMITTED').length;
-  const inProgressCount = participants.filter((p) => p.status === 'IN_PROGRESS').length;
-  const waitingCount = participants.filter((p) => p.status === 'JOINED').length;
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(quiz.code);
     setCopiedCode(true);
-    message.success(`Kode kuis [${quiz.code}] berhasil disalin!`);
+    message.success(`Kode kuis [${quiz.code}] disalin!`);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
@@ -58,14 +55,25 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
     }
   };
 
+  const participants = quiz.participants || [];
+  const waitingCount = participants.filter((p) => p.status === 'JOINED').length;
+  const inProgressCount = participants.filter((p) => p.status === 'IN_PROGRESS').length;
+  const submittedCount = participants.filter((p) => p.status === 'SUBMITTED').length;
+
+  const filteredParticipants = participants.filter(
+    (p) =>
+      p.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.identifier && p.identifier.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Top Banner Control */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Quiz Details */}
           <div className="space-y-1">
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
                 {quiz.subject || 'Kuis Interaktif'}
               </span>
@@ -80,7 +88,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
                     ? 'default'
                     : 'purple'
                 }
-                className="font-bold text-[10px]"
+                className="font-bold text-[10px] m-0"
               >
                 {quiz.status === 'ACTIVE' && 'SEDANG BERLANGSUNG'}
                 {quiz.status === 'WAITING' && 'MENUNGGU PESERTA (LOBBY)'}
@@ -89,7 +97,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
               </Tag>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
               {quiz.title}
             </h1>
 
@@ -98,9 +106,9 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
             </p>
           </div>
 
-          {/* Room Code Card */}
-          <div className="flex items-center space-x-3 self-start md:self-auto bg-slate-50 p-3 rounded-2xl border border-slate-200">
-            <div className="text-center px-2">
+          {/* Room Code Card (Mobile Full Width, Desktop Compact) */}
+          <div className="flex items-center justify-between sm:justify-start space-x-3 bg-slate-50 p-3 rounded-2xl border border-slate-200 w-full sm:w-auto">
+            <div className="text-left sm:text-center px-1">
               <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
                 Kode Akses
               </div>
@@ -109,21 +117,21 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
               </div>
             </div>
 
-            <div className="flex flex-col space-y-1">
+            <div className="flex items-center space-x-1.5">
               <Button
-                size="small"
+                size="middle"
                 onClick={handleCopyCode}
-                className="rounded-lg font-bold text-xs flex items-center"
+                className="rounded-xl font-bold text-xs flex items-center h-9"
               >
-                {copiedCode ? <Check className="w-3 h-3 text-emerald-600 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-600 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
                 <span>{copiedCode ? 'Disalin' : 'Salin'}</span>
               </Button>
               <Button
-                size="small"
+                size="middle"
                 onClick={() => setIsShareOpen(true)}
-                className="rounded-lg font-bold text-xs bg-indigo-50 text-indigo-700 border-indigo-200 flex items-center"
+                className="rounded-xl font-bold text-xs bg-indigo-50 text-indigo-700 border-indigo-200 flex items-center h-9"
               >
-                <Share2 className="w-3 h-3 mr-1" />
+                <Share2 className="w-3.5 h-3.5 mr-1" />
                 <span>Bagikan</span>
               </Button>
             </div>
@@ -131,7 +139,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
         </div>
 
         {/* Action Buttons & Status Controllers */}
-        <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           {/* Main Status Toggle Buttons */}
           <div className="flex items-center space-x-2">
             {quiz.status !== 'ACTIVE' ? (
@@ -140,17 +148,18 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
                 size="large"
                 loading={statusLoading}
                 onClick={() => handleStatusChange('ACTIVE')}
-                className="rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center space-x-2 shadow-sm"
+                className="w-full sm:w-auto h-11 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
               >
                 <Play className="w-4 h-4 fill-white" />
                 <span>Mulai Kuis Sekarang (Buka Lembar Soal)</span>
               </Button>
             ) : (
               <Button
+                type="primary"
                 size="large"
                 loading={statusLoading}
                 onClick={() => handleStatusChange('ENDED')}
-                className="rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white border-0 flex items-center space-x-2 shadow-sm"
+                className="w-full sm:w-auto h-11 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
               >
                 <Pause className="w-4 h-4" />
                 <span>Selesaikan & Kunci Kuis</span>
@@ -161,158 +170,203 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
               <Button
                 size="large"
                 onClick={() => handleStatusChange('WAITING')}
-                className="rounded-xl font-bold text-xs"
+                className="h-11 rounded-xl font-bold text-xs"
               >
                 <RotateCcw className="w-3.5 h-3.5 mr-1" />
-                <span>Buka Kembali ke Ruang Tunggu</span>
+                <span>Buka Kembali</span>
               </Button>
             )}
           </div>
 
           {/* Quick Nav Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <Button
               size="middle"
               onClick={onEditQuestions}
-              className="rounded-xl font-bold text-xs flex items-center space-x-1.5"
+              className="h-10 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5"
             >
               <FileEdit className="w-3.5 h-3.5 text-indigo-600" />
               <span>Kelola Soal ({quiz.questions.length})</span>
             </Button>
 
             <Button
+              type="primary"
               size="middle"
               onClick={onViewLeaderboard}
-              className="rounded-xl font-bold text-xs bg-indigo-50 text-indigo-700 border-indigo-200 flex items-center space-x-1.5"
+              className="h-10 rounded-xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-white border-0 flex items-center justify-center space-x-1.5 shadow-sm"
             >
-              <Trophy className="w-3.5 h-3.5 text-amber-500" />
-              <span>Lihat Leaderboard</span>
+              <Award className="w-3.5 h-3.5 text-amber-400" />
+              <span>Papan Nilai</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Participants Live Grid & Presence */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Live Participant Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+        {/* Total */}
+        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-black flex-shrink-0">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">
+              Total Hadir
+            </div>
+            <div className="text-lg sm:text-2xl font-black text-slate-900">
+              {participants.length}
+            </div>
+          </div>
+        </div>
+
+        {/* Waiting */}
+        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black flex-shrink-0">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">
+              Di Lobby
+            </div>
+            <div className="text-lg sm:text-2xl font-black text-amber-600">
+              {waitingCount}
+            </div>
+          </div>
+        </div>
+
+        {/* In Progress */}
+        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black flex-shrink-0">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">
+              Mengerjakan
+            </div>
+            <div className="text-lg sm:text-2xl font-black text-blue-600">
+              {inProgressCount}
+            </div>
+          </div>
+        </div>
+
+        {/* Submitted */}
+        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black flex-shrink-0">
+            <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">
+              Selesai
+            </div>
+            <div className="text-lg sm:text-2xl font-black text-emerald-600">
+              {submittedCount}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Participants List */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <Users className="w-4 h-4 text-indigo-600" />
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
-              Peserta Bergabung Realtime ({participants.length})
-            </h2>
+            <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wider">
+              Daftar Peserta Masuk ({filteredParticipants.length})
+            </h3>
           </div>
 
-          {/* Quick status counters */}
-          <div className="flex items-center space-x-2 text-xs">
-            <span className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
-              {submittedCount} Selesai
-            </span>
-            <span className="px-2 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold border border-blue-100">
-              {inProgressCount} Mengerjakan
-            </span>
-            <span className="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold border border-slate-200">
-              {waitingCount} Menunggu
-            </span>
+          <div className="flex items-center space-x-2">
+            <Input
+              prefix={<Search className="w-3.5 h-3.5 text-slate-400 mr-1" />}
+              placeholder="Cari nama atau ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="rounded-xl text-xs w-full sm:w-56"
+              size="middle"
+              allowClear
+            />
+
+            {participants.length > 0 && (
+              <Popconfirm
+                title="Reset semua peserta?"
+                description="Peserta yang sudah bergabung akan dikeluarkan."
+                onConfirm={() => resetQuizParticipants(quiz.id)}
+                okText="Reset"
+                cancelText="Batal"
+                okButtonProps={{ danger: true }}
+              >
+                <Button size="middle" danger className="rounded-xl text-xs font-bold">
+                  Reset
+                </Button>
+              </Popconfirm>
+            )}
           </div>
         </div>
 
         {/* Participants Cards Grid */}
-        {participants.length === 0 ? (
-          <div className="py-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 mx-auto flex items-center justify-center font-bold">
-              <Users className="w-6 h-6" />
-            </div>
-            <div className="text-sm font-bold text-slate-700">
-              Menunggu Peserta Bergabung...
-            </div>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Bagikan kode kuis <span className="font-mono font-black text-indigo-700">{quiz.code}</span> kepada peserta untuk mulai bergabung ke ruangan kuis ini.
+        {filteredParticipants.length === 0 ? (
+          <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-2xl p-6">
+            <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <p className="text-xs font-bold text-slate-600">
+              Belum ada peserta yang bergabung.
             </p>
-            <Button
-              type="primary"
-              size="middle"
-              onClick={() => setIsShareOpen(true)}
-              className="rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700"
-            >
-              Bagikan Kode Kuis
-            </Button>
+            <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
+              Bagikan kode kuis <span className="font-mono font-bold text-indigo-600">[{quiz.code}]</span> kepada peserta untuk mulai bergabung.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {participants.map((p) => {
-              const isSubmitted = p.status === 'SUBMITTED';
-              const isInProgress = p.status === 'IN_PROGRESS';
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            {filteredParticipants.map((p) => {
               return (
                 <div
                   key={p.uid}
-                  className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between space-y-2.5 ${
-                    isSubmitted
-                      ? 'border-emerald-300 bg-emerald-50/30'
-                      : isInProgress
-                      ? 'border-blue-300 bg-blue-50/20'
-                      : 'border-slate-200 bg-white'
-                  }`}
+                  className="p-3 sm:p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-indigo-400 transition-all flex items-center justify-between space-x-2.5 group"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2.5 overflow-hidden">
-                      <img
-                        src={p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.uid}`}
-                        alt=""
-                        className="w-9 h-9 rounded-full border border-slate-200 bg-white flex-shrink-0"
-                      />
-                      <div className="overflow-hidden">
-                        <div className="font-bold text-xs text-slate-900 truncate">
-                          {p.fullName}
-                        </div>
-                        <div className="text-[11px] font-mono text-slate-500 truncate">
-                          ID: {p.identifier}
-                        </div>
+                  <div className="flex items-center space-x-2.5 overflow-hidden">
+                    <img
+                      src={p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.uid}`}
+                      alt=""
+                      className="w-8 h-8 rounded-full border border-slate-200 bg-white flex-shrink-0"
+                    />
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-slate-800 truncate">
+                        {p.fullName}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-mono">
+                        ID: {p.identifier}
                       </div>
                     </div>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5 flex-shrink-0">
+                    {p.status === 'SUBMITTED' ? (
+                      <Tag color="green" className="font-black text-[10px] m-0">
+                        {p.percentage}/100
+                      </Tag>
+                    ) : p.status === 'IN_PROGRESS' ? (
+                      <Tag color="blue" className="font-bold text-[9px] m-0">
+                        Mengerjakan
+                      </Tag>
+                    ) : (
+                      <Tag color="orange" className="font-bold text-[9px] m-0">
+                        Lobby
+                      </Tag>
+                    )}
 
                     <Popconfirm
-                      title="Keluarkan Peserta?"
-                      description="Peserta ini akan dikeluarkan dari kuis."
+                      title="Keluarkan peserta?"
                       onConfirm={() => kickParticipant(quiz.id, p.uid)}
                       okText="Ya"
                       cancelText="Batal"
                     >
                       <button
                         type="button"
-                        className="text-slate-300 hover:text-red-500 p-0.5"
-                        title="Keluarkan Peserta"
+                        className="text-slate-300 hover:text-red-500 p-1 rounded transition-colors"
+                        title="Keluarkan"
                       >
-                        <UserMinus className="w-3.5 h-3.5" />
+                        <UserX className="w-3.5 h-3.5" />
                       </button>
                     </Popconfirm>
-                  </div>
-
-                  {/* Status & Score */}
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <div>
-                      {isSubmitted ? (
-                        <span className="font-black text-indigo-700 text-sm">
-                          {p.percentage ?? 0}
-                          <span className="text-[10px] text-slate-400 font-normal"> / 100</span>
-                        </span>
-                      ) : isInProgress ? (
-                        <span className="text-[11px] font-bold text-blue-600 animate-pulse">
-                          Sedang Mengerjakan...
-                        </span>
-                      ) : (
-                        <span className="text-[11px] font-medium text-slate-400">
-                          Menunggu Mulai
-                        </span>
-                      )}
-                    </div>
-
-                    <Tag
-                      color={isSubmitted ? 'green' : isInProgress ? 'blue' : 'default'}
-                      className="font-bold text-[9px] m-0"
-                    >
-                      {isSubmitted ? 'SELESAI' : isInProgress ? 'AKTIF' : 'HADIR'}
-                    </Tag>
                   </div>
                 </div>
               );
@@ -321,7 +375,6 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
         )}
       </div>
 
-      {/* Share Modal */}
       <ShareQuizModal
         quiz={quiz}
         open={isShareOpen}
