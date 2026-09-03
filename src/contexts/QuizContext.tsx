@@ -97,21 +97,50 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [activeQuizId]);
 
-  // Realtime Firestore Listener for Quizzes
+  // Realtime Firestore Listener for Quizzes with direct backup fetch
   useEffect(() => {
     if (!db || !db.app) return;
 
     let unsubQuizzes: (() => void) | undefined;
-    try {
-      const quizzesCol = collection(db, 'quizzes');
-      unsubQuizzes = onSnapshot(quizzesCol, (snap) => {
+
+    const fetchDirect = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'quizzes'));
         const list: Quiz[] = [];
         snap.forEach((docSnap) => {
           list.push(docSnap.data() as Quiz);
         });
         list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setQuizzes(list);
-      }, (err) => console.warn('Quizzes listener error:', err));
+        if (list.length > 0) {
+          setQuizzes(list);
+        }
+      } catch (err) {
+        console.warn('Initial direct quiz fetch note:', err);
+      }
+    };
+
+    // 1. Initial direct fetch immediately
+    fetchDirect();
+
+    // 2. Realtime onSnapshot listener
+    try {
+      const quizzesCol = collection(db, 'quizzes');
+      unsubQuizzes = onSnapshot(
+        quizzesCol,
+        (snap) => {
+          const list: Quiz[] = [];
+          snap.forEach((docSnap) => {
+            list.push(docSnap.data() as Quiz);
+          });
+          list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          setQuizzes(list);
+        },
+        (err) => {
+          console.warn('Quizzes listener note:', err);
+          // Fallback direct getDocs if snapshot encounters any transient error
+          fetchDirect();
+        }
+      );
     } catch (e) {
       console.warn('Firebase snapshot init warning:', e);
     }
@@ -327,15 +356,60 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 9. JOIN QUIZ BY CODE (Participant)
+  // 9. JOIN QUIZ BY CODE (Robust: Memory Check + Direct Firestore Query with auto formatting)
   const joinQuizByCode = async (
     code: string,
     user: UserProfile
   ): Promise<{ success: boolean; quiz?: Quiz; error?: string }> => {
-    const cleanCode = code.trim().toUpperCase();
+    const cleanCode = code.trim().toUpperCase().replace(/\s+/g, '');
     if (!cleanCode) return { success: false, error: 'Masukkan kode kuis.' };
 
-    const targetQuiz = quizzes.find((q) => q.code.toUpperCase() === cleanCode);
+    // 1. Try finding in-memory first
+    let targetQuiz = quizzes.find((q) => {
+      const qCode = q.code.toUpperCase().replace(/\s+/g, '');
+      return qCode === cleanCode || qCode.replace(/-/g, '') === cleanCode.replace(/-/g, '');
+    });
+
+    // 2. If not found in memory, query Firestore directly!
+    if (!targetQuiz && db && db.app) {
+      try {
+        const qCol = collection(db, 'quizzes');
+        
+        // Exact query
+        let qQuery = query(qCol, where('code', '==', cleanCode));
+        let snap = await getDocs(qQuery);
+
+        // Try with hyphen e.g. QZ-BJRJ if user typed QZBJRJ
+        if (snap.empty && !cleanCode.includes('-')) {
+          const formatted = cleanCode.startsWith('QZ')
+            ? `QZ-${cleanCode.slice(2)}`
+            : `QZ-${cleanCode}`;
+          const qQuery2 = query(qCol, where('code', '==', formatted));
+          snap = await getDocs(qQuery2);
+        }
+
+        // Try without hyphen if user typed QZ-BJRJ
+        if (snap.empty && cleanCode.includes('-')) {
+          const stripped = cleanCode.replace(/-/g, '');
+          const qQuery3 = query(qCol, where('code', '==', stripped));
+          snap = await getDocs(qQuery3);
+        }
+
+        if (!snap.empty) {
+          targetQuiz = snap.docs[0].data() as Quiz;
+          // Synchronize into state immediately
+          setQuizzes((prev) => {
+            const exists = prev.some((q) => q.id === targetQuiz!.id);
+            return exists
+              ? prev.map((q) => (q.id === targetQuiz!.id ? targetQuiz! : q))
+              : [targetQuiz!, ...prev];
+          });
+        }
+      } catch (err) {
+        console.warn('Direct Firestore query error:', err);
+      }
+    }
+
     if (!targetQuiz) {
       return { success: false, error: `Kuis dengan kode [${cleanCode}] tidak ditemukan.` };
     }
@@ -595,7 +669,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         prev.map((q) => (q.id === quizId ? { ...q, participants: updatedParticipants } : q))
       );
 
-      // Confetti celebration if passed or good score!
+      // Confetti celebration if passed
       if (percentage >= targetQuiz.settings.passingScore) {
         confetti({
           particleCount: 120,
