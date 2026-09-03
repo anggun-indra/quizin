@@ -341,7 +341,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (targetQuiz.status === 'ENDED') {
-      return { success: false, error: 'Kuis ini sudah selesai dan ditutup oleh pengampu.' };
+      return { success: false, error: 'Kuis ini sudah selesai dan ditutup oleh pembuat kuis.' };
     }
 
     // Check if already in participants list

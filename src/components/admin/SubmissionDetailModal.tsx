@@ -67,7 +67,7 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
               </Tag>
             </h2>
             <div className="text-xs text-slate-500 font-mono mt-0.5">
-              NIM: {participant.identifier} • {participant.email}
+              ID: {participant.identifier} • {participant.email}
             </div>
           </div>
 
@@ -203,7 +203,7 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
                     <div className="text-xs space-y-1 mt-2">
                       <div className="p-2 rounded-lg bg-white border border-slate-200">
                         <span className="text-slate-400 text-[10px] uppercase font-bold block">
-                          Jawaban Mahasiswa:
+                          Jawaban Peserta:
                         </span>
                         <span className="font-mono font-bold text-slate-800">
                           {userAnswers[0] || '(Tidak dijawab)'}

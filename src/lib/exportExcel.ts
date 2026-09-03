@@ -17,7 +17,7 @@ export const exportQuizResultsToExcel = (quiz: Quiz) => {
 
     return {
       'Peringkat': index + 1,
-      'NIM / ID': p.identifier,
+      'ID / NIM': p.identifier,
       'Nama Lengkap': p.fullName,
       'Email': p.email,
       'Status': p.status === 'SUBMITTED' ? 'Selesai' : p.status === 'IN_PROGRESS' ? 'Mengerjakan' : 'Hadir',
@@ -43,12 +43,12 @@ export const exportQuizResultsToExcel = (quiz: Quiz) => {
   const passedCount = submitted.filter(p => (p.percentage || 0) >= quiz.settings.passingScore).length;
 
   const summaryRows = [
-    { 'Peringkat': '', 'NIM / ID': '', 'Nama Lengkap': '' },
-    { 'Peringkat': 'RINGKASAN KUIS', 'NIM / ID': quiz.title, 'Nama Lengkap': `Kode: ${quiz.code}` },
-    { 'Peringkat': 'Mata Kuliah', 'NIM / ID': quiz.subject || '-', 'Nama Lengkap': `Total Soal: ${quiz.questions.length}` },
-    { 'Peringkat': 'Standar KKM', 'NIM / ID': `${quiz.settings.passingScore}`, 'Nama Lengkap': `Rata-rata: ${avgScore}` },
-    { 'Peringkat': 'Tertinggi / Terendah', 'NIM / ID': `${highestScore} / ${lowestScore}`, 'Nama Lengkap': `Lulus: ${passedCount}/${submitted.length}` },
-    { 'Peringkat': '', 'NIM / ID': '', 'Nama Lengkap': '' },
+    { 'Peringkat': '', 'ID / NIM': '', 'Nama Lengkap': '' },
+    { 'Peringkat': 'RINGKASAN KUIS', 'ID / NIM': quiz.title, 'Nama Lengkap': `Kode: ${quiz.code}` },
+    { 'Peringkat': 'Kategori / Topik', 'ID / NIM': quiz.subject || '-', 'Nama Lengkap': `Total Soal: ${quiz.questions.length}` },
+    { 'Peringkat': 'Standar KKM', 'ID / NIM': `${quiz.settings.passingScore}`, 'Nama Lengkap': `Rata-rata: ${avgScore}` },
+    { 'Peringkat': 'Tertinggi / Terendah', 'ID / NIM': `${highestScore} / ${lowestScore}`, 'Nama Lengkap': `Lulus: ${passedCount}/${submitted.length}` },
+    { 'Peringkat': '', 'ID / NIM': '', 'Nama Lengkap': '' },
   ];
 
   const worksheet = XLSX.utils.json_to_sheet([...summaryRows, ...rows]);

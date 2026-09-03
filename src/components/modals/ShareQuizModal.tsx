@@ -33,10 +33,10 @@ export const ShareQuizModal: React.FC<ShareQuizModalProps> = ({ quiz, open, onCl
 
   const handleWhatsAppShare = () => {
     const text = encodeURIComponent(
-      `Halo teman-teman! Silakan bergabung ke kuis *${quiz.title}* di QuizIn:\n\n` +
+      `Halo! Silakan bergabung ke kuis *${quiz.title}* di QuizIn:\n\n` +
       `🌐 Link: ${joinUrl}\n` +
       `🔑 Kode Kuis: *${quiz.code}*\n\n` +
-      `Pastikan sudah login dengan akun Google dan mengisi NIM Anda.`
+      `Masuk dengan akun Google Anda dan mulai mengerjakan soal!`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
@@ -66,7 +66,7 @@ export const ShareQuizModal: React.FC<ShareQuizModalProps> = ({ quiz, open, onCl
         {/* Big Code Card */}
         <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Kode Akses Mahasiswa
+            Kode Akses Peserta
           </span>
           <div className="text-3xl font-mono font-black text-indigo-700 tracking-widest">
             {quiz.code}
@@ -89,7 +89,7 @@ export const ShareQuizModal: React.FC<ShareQuizModalProps> = ({ quiz, open, onCl
             className="w-full h-11 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Bagikan ke Grup WhatsApp</span>
+            <span>Bagikan ke WhatsApp</span>
           </Button>
 
           <Button

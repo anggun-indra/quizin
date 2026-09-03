@@ -540,7 +540,7 @@ export const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onBack }) => {
               <div className="pt-2 border-t border-slate-100">
                 <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center">
                   <HelpCircle className="w-3.5 h-3.5 mr-1 text-amber-500" />
-                  Pembahasan / Penjelasan Soal (Tampil saat mahasiswa melihat review nilai)
+                  Pembahasan / Penjelasan Soal (Tampil saat peserta melihat review nilai)
                 </label>
                 <Input.TextArea
                   rows={2}

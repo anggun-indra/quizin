@@ -43,10 +43,10 @@ export const AuthPage: React.FC = () => {
             </div>
 
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Platform Kuis Realtime Mahasiswa
+              Platform Kuis Realtime Interaktif
             </h1>
             <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-              Masuk dengan akun Google untuk membuat kuis baru sebagai pengampu atau bergabung dengan kode kuis untuk mengerjakan soal dan melihat nilai langsung.
+              Masuk dengan akun Google untuk membuat kuis baru sebagai pembuat kuis (host) atau bergabung dengan kode kuis untuk mengerjakan soal dan melihat nilai secara langsung.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export const AuthPage: React.FC = () => {
 
       {/* Footer */}
       <div className="max-w-4xl mx-auto w-full text-center text-[11px] sm:text-xs text-slate-400">
-        &copy; {new Date().getFullYear()} QuizIn • Terintegrasi dengan Sistem Kelompokin & Perkuliahan.
+        &copy; {new Date().getFullYear()} QuizIn • Platform Kuis & Evaluasi Realtime.
       </div>
     </div>
   );

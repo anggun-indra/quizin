@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "QuizIn - Platform Kuis Realtime Mahasiswa & Dosen Terintegrasi dengan Firebase",
+  "description": "QuizIn - Platform Kuis Realtime Interaktif Terintegrasi dengan Firebase",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

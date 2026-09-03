@@ -126,7 +126,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
               prefix={<Search className="w-3.5 h-3.5 text-slate-400 mr-1" />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari berdasarkan Nama atau NIM..."
+              placeholder="Cari berdasarkan Nama atau ID..."
               className="rounded-xl text-xs h-10"
               allowClear
             />
@@ -149,7 +149,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
             <thead>
               <tr className="border-b border-slate-200 text-slate-400 uppercase text-[10px] font-black tracking-wider bg-slate-50/50">
                 <th className="py-3 px-3 text-center">Rank</th>
-                <th className="py-3 px-3">Mahasiswa</th>
+                <th className="py-3 px-3">Peserta</th>
                 <th className="py-3 px-3">Status</th>
                 <th className="py-3 px-3 text-center">Nilai Akhir</th>
                 <th className="py-3 px-3 text-center">Status KKM</th>

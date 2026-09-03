@@ -67,7 +67,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
-                {quiz.subject || 'Kuis Kuliah'}
+                {quiz.subject || 'Kuis Interaktif'}
               </span>
               <span>•</span>
               <Tag
@@ -94,7 +94,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
             </h1>
 
             <p className="text-xs text-slate-500 max-w-xl">
-              {quiz.description || 'Kuis interaktif mahasiswa dengan sistem penilaian realtime.'}
+              {quiz.description || 'Kuis interaktif dengan sistem penilaian realtime.'}
             </p>
           </div>
 
@@ -226,7 +226,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
               Menunggu Peserta Bergabung...
             </div>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Bagikan kode kuis <span className="font-mono font-black text-indigo-700">{quiz.code}</span> kepada mahasiswa untuk mulai bergabung ke ruangan kuis ini.
+              Bagikan kode kuis <span className="font-mono font-black text-indigo-700">{quiz.code}</span> kepada peserta untuk mulai bergabung ke ruangan kuis ini.
             </p>
             <Button
               type="primary"
@@ -266,7 +266,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
                           {p.fullName}
                         </div>
                         <div className="text-[11px] font-mono text-slate-500 truncate">
-                          NIM: {p.identifier}
+                          ID: {p.identifier}
                         </div>
                       </div>
                     </div>

@@ -31,27 +31,27 @@ const generateRandomCode = () => {
   return result;
 };
 
-// Default sample questions for quick testing
+// Default sample questions for quick testing (General / Technology)
 const getDefaultSampleQuestions = (): Question[] => [
   {
     id: `q_${Date.now()}_1`,
     order: 1,
-    text: 'Manakah di bawah ini yang merupakan struktur data dengan prinsip FIFO (First In First Out)?',
+    text: 'Protokol internet manakah yang digunakan untuk mengamankan komunikasi data melalui enkripsi TLS/SSL?',
     type: 'SINGLE_CHOICE',
     points: 20,
     options: [
-      { id: 'opt_1', text: 'Stack' },
-      { id: 'opt_2', text: 'Queue' },
-      { id: 'opt_3', text: 'Binary Tree' },
-      { id: 'opt_4', text: 'Graph' },
+      { id: 'opt_1', text: 'HTTP' },
+      { id: 'opt_2', text: 'HTTPS' },
+      { id: 'opt_3', text: 'FTP' },
+      { id: 'opt_4', text: 'SMTP' },
     ],
     correctAnswers: ['opt_2'],
-    explanation: 'Queue (antrean) beroperasi berdasarkan prinsip First-In, First-Out (FIFO). Elemen pertama yang masuk akan menjadi elemen pertama yang keluar.',
+    explanation: 'HTTPS (Hypertext Transfer Protocol Secure) menggunakan enkripsi TLS/SSL untuk mengamankan pertukaran data di internet.',
   },
   {
     id: `q_${Date.now()}_2`,
     order: 2,
-    text: 'Algoritma pencarian Binary Search memiliki kompleksitas waktu rata-rata (average time complexity) sebesar O(log n).',
+    text: 'Dalam komputasi awan (Cloud Computing), SaaS merupakan singkatan dari "Software as a Service".',
     type: 'TRUE_FALSE',
     points: 20,
     options: [
@@ -59,17 +59,17 @@ const getDefaultSampleQuestions = (): Question[] => [
       { id: 'opt_f', text: 'Salah' },
     ],
     correctAnswers: ['opt_t'],
-    explanation: 'Benar. Binary Search membagi ruang pencarian menjadi setengah pada setiap langkahnya sehingga kompleksitasnya adalah O(log n).',
+    explanation: 'Benar. SaaS adalah model layanan cloud di mana perangkat lunak diakses melalui internet tanpa instalasi lokal.',
   },
   {
     id: `q_${Date.now()}_3`,
     order: 3,
-    text: 'Sebutkan kata kunci (keyword) dalam bahasa pemrograman Java atau C++ yang digunakan untuk membuat pewarisan (inheritance) antar kelas!',
+    text: 'Format data pertukaran teks terbuka yang paling populer dan ringan berbasis pasangan key-value adalah...',
     type: 'SHORT_ANSWER',
     points: 20,
     options: [],
-    correctAnswers: ['extends', ': public', 'inherits'],
-    explanation: 'Dalam bahasa Java, pewarisan kelas menggunakan kata kunci "extends".',
+    correctAnswers: ['json', 'javascript object notation'],
+    explanation: 'JSON (JavaScript Object Notation) adalah format pertukaran data standar yang ringkas dan mudah dibaca manusia serta mesin.',
   },
 ];
 
@@ -155,7 +155,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
               Buat Kuis Baru
             </h2>
             <p className="text-xs text-slate-500">
-              Atur informasi kuis, durasi waktu, dan bagikan kode akses ke mahasiswa.
+              Atur informasi kuis, durasi waktu, dan bagikan kode akses ke peserta.
             </p>
           </div>
         </div>
@@ -171,7 +171,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Contoh: Kuis 1 - Logika Pemrograman & Algoritma"
+              placeholder="Contoh: Kuis Pengetahuan Umum / Workshop & Pelatihan"
               size="large"
               className="rounded-xl font-semibold text-sm"
             />
@@ -182,12 +182,12 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center">
                 <BookOpen className="w-3.5 h-3.5 mr-1 text-slate-500" />
-                Mata Kuliah / Topik
+                Kategori / Topik Kuis
               </label>
               <Input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Contoh: Algoritma Pemrograman"
+                placeholder="Contoh: Teknologi / Pengetahuan Umum"
                 size="large"
                 className="rounded-xl font-medium text-sm"
               />
@@ -225,7 +225,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Contoh: Kerjakan secara mandiri. Dilarang bekerja sama. Waktu pengerjaan 15 menit."
+              placeholder="Contoh: Jawablah pertanyaan berikut dengan teliti. Selamat mengerjakan!"
               className="rounded-xl text-xs"
             />
           </div>
@@ -255,7 +255,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
               <div>
                 <label className="block text-[11px] font-bold text-slate-600 mb-1 flex items-center">
                   <Award className="w-3 h-3 mr-1 text-amber-500" />
-                  Standar Kelulusan (KKM)
+                  Target Skor Minimum (KKM)
                 </label>
                 <InputNumber
                   min={0}
@@ -304,7 +304,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
             {/* Include Samples checkbox */}
             <div className="pt-1 flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-700">
-                Sertakan 3 Contoh Soal Siap Pakai (Bisa diedit nanti)
+                Sertakan 3 Contoh Soal Siap Pakai (Bisa diedit kapan saja)
               </span>
               <Switch checked={includeSamples} onChange={setIncludeSamples} size="small" />
             </div>

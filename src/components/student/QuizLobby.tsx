@@ -46,7 +46,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
         <div className="space-y-2">
           <div className="flex items-center justify-center space-x-2">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
-              {quiz.subject || 'Kuis Kuliah'}
+              {quiz.subject || 'Kuis Interaktif'}
             </span>
             <Tag color="warning" className="font-bold text-[10px]">
               RUANG TUNGGU (LOBBY)
@@ -58,7 +58,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-            {quiz.description || 'Harap tetap berada di halaman ini. Kuis akan dimulai secara otomatis begitu pengampu memulai kuis.'}
+            {quiz.description || 'Harap tetap berada di halaman ini. Kuis akan dimulai secara otomatis begitu pembuat kuis (host) memulai kuis.'}
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
           </div>
 
           <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-slate-400">Pengampu</div>
+            <div className="text-[10px] uppercase font-bold text-slate-400">Pembuat Kuis</div>
             <div className="text-xs font-bold text-slate-800 truncate px-1">
               {quiz.creatorName}
             </div>
@@ -104,7 +104,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-600"></span>
           </span>
-          <span>Menunggu pengampu memulai kuis... Halaman akan otomatis berpindah.</span>
+          <span>Menunggu pembuat kuis (host) memulai kuis... Halaman akan otomatis berpindah.</span>
         </div>
 
         {/* Leave button */}
@@ -126,7 +126,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
           <div className="flex items-center space-x-2">
             <Users className="w-4 h-4 text-indigo-600" />
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-              Teman Sekelas yang Sudah Masuk ({participants.length})
+              Peserta yang Sudah Masuk ({participants.length})
             </h3>
           </div>
           <span className="text-[11px] font-bold text-slate-400">

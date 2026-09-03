@@ -33,7 +33,7 @@ export const CompleteProfileModal: React.FC<CompleteProfileModalProps> = ({
       return;
     }
     if (!identifier.trim()) {
-      message.warning('Harap masukkan Nomor Identitas / NIM / ID Anda.');
+      message.warning('Harap masukkan Nomor Identitas / ID Anda.');
       return;
     }
 
@@ -78,7 +78,7 @@ export const CompleteProfileModal: React.FC<CompleteProfileModalProps> = ({
             Lengkapi Identitas Pengguna
           </h2>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Identitas (NIM & Nama) terhubung langsung dengan sistem perkuliahan dan kuis Anda.
+            Identitas (Nomor ID & Nama Lengkap) digunakan untuk rekap skor dan catatan kuis Anda.
           </p>
         </div>
 
@@ -113,16 +113,16 @@ export const CompleteProfileModal: React.FC<CompleteProfileModalProps> = ({
             />
           </div>
 
-          {/* Identifier / NIM / NIP / ID */}
+          {/* Identifier / ID / NIM / NIP */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center">
               <IdCard className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
-              Nomor Induk Mahasiswa (NIM / NIP) <span className="text-red-500 ml-0.5">*</span>
+              Nomor Identitas / ID Peserta (NIM / NIP / ID) <span className="text-red-500 ml-0.5">*</span>
             </label>
             <Input
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Contoh: 2201010042"
+              placeholder="Contoh: 2201010042 atau ID-9821"
               size="large"
               className="rounded-xl font-mono font-bold text-slate-900 tracking-wider"
             />

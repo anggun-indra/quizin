@@ -2,7 +2,7 @@ export interface UserProfile {
   uid: string;
   email: string;
   fullName: string;
-  identifier?: string; // NIM / NIP / ID Peserta (shared with Kelompokin)
+  identifier?: string; // Nomor Identitas / ID Peserta / NIM
   avatarUrl?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -34,7 +34,7 @@ export interface QuizSettings {
   shuffleOptions: boolean;
   showLiveScore: boolean;
   showAnswerDiscussion: boolean;
-  passingScore: number; // KKM, e.g. 70
+  passingScore: number; // Target Skor Minimum, e.g. 70
 }
 
 export type QuizStatus = 'DRAFT' | 'WAITING' | 'ACTIVE' | 'ENDED';
@@ -43,7 +43,7 @@ export type ParticipantStatus = 'JOINED' | 'IN_PROGRESS' | 'SUBMITTED';
 
 export interface QuizParticipant {
   uid: string;
-  identifier: string; // NIM
+  identifier: string; // ID Peserta / NIM
   fullName: string;
   email: string;
   avatarUrl?: string;
@@ -62,10 +62,10 @@ export interface QuizParticipant {
 
 export interface Quiz {
   id: string;
-  code: string; // e.g. "QZ-8821" or "ALGO-01"
+  code: string; // e.g. "QZ-8821" or "TEST-01"
   title: string;
   description?: string;
-  subject?: string; // Mata Kuliah
+  subject?: string; // Topik / Kategori Kuis
   creatorUid: string;
   creatorEmail: string;
   creatorName: string;

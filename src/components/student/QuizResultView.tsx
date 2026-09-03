@@ -166,7 +166,7 @@ export const QuizResultView: React.FC<QuizResultViewProps> = ({
             }`}
           >
             <Trophy className="w-3.5 h-3.5 text-amber-500" />
-            <span>Papan Skor Kelas (Leaderboard)</span>
+            <span>Papan Skor (Leaderboard)</span>
           </Button>
         </div>
       </div>
@@ -299,7 +299,7 @@ export const QuizResultView: React.FC<QuizResultViewProps> = ({
             <div className="flex items-center space-x-2">
               <Trophy className="w-5 h-5 text-amber-500" />
               <h2 className="text-base font-black text-slate-900">
-                Peringkat Kelas Realtime
+                Papan Peringkat Realtime
               </h2>
             </div>
             <span className="text-xs font-bold text-slate-400">

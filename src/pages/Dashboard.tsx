@@ -205,7 +205,7 @@ export const Dashboard: React.FC = () => {
             Selamat Datang, {user.fullName}!
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
-            Buat sesi kuis perkuliahan baru untuk mahasiswa atau masukkan kode akses kuis untuk mulai mengerjakan soal dan melihat nilai.
+            Buat sesi kuis interaktif baru untuk peserta atau masukkan kode akses kuis untuk mulai mengerjakan soal dan melihat nilai.
           </p>
         </div>
 
@@ -221,7 +221,7 @@ export const Dashboard: React.FC = () => {
                 Buat Kuis Baru
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Untuk Pengampu / Dosen / Pembuat Kuis. Tentukan jumlah soal, durasi waktu, kunci jawaban, dan bagikan kode kuis.
+                Untuk Pembuat Kuis / Host / Penyelenggara. Tentukan jumlah soal, durasi waktu, kunci jawaban, dan bagikan kode kuis.
               </p>
             </div>
             <Button
@@ -245,7 +245,7 @@ export const Dashboard: React.FC = () => {
                 Gabung dengan Kode Kuis
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Untuk Peserta / Mahasiswa. Masukkan kode akses kuis yang diberikan pengampu untuk mengerjakan soal dan mengetahui nilai Anda.
+                Untuk Peserta / Pengguna. Masukkan kode akses kuis yang diberikan pembuat kuis untuk mengerjakan soal dan mengetahui nilai Anda.
               </p>
             </div>
             <Button
@@ -309,7 +309,7 @@ export const Dashboard: React.FC = () => {
                       </h4>
 
                       <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
-                        {q.subject || 'Mata Kuliah Umum'}
+                        {q.subject || 'Topik Umum'}
                       </p>
                     </div>
 

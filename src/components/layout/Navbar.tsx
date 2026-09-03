@@ -108,7 +108,7 @@ export const Navbar: React.FC = () => {
             {user?.fullName}
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-            NIM: {user?.identifier || '(Belum diset)'}
+            ID: {user?.identifier || '(Belum diset)'}
           </div>
           <div className="text-[10px] text-slate-400 truncate">
             {user?.email}
@@ -124,7 +124,7 @@ export const Navbar: React.FC = () => {
       label: (
         <div className="flex items-center text-xs font-semibold text-slate-700 py-1">
           <Edit3 className="w-3.5 h-3.5 mr-2 text-indigo-600" />
-          Edit Profil (Nama & NIM)
+          Edit Profil (Nama & ID)
         </div>
       ),
       onClick: () => setIsEditProfileOpen(true),
@@ -170,7 +170,7 @@ export const Navbar: React.FC = () => {
                     </span>
                   </div>
                   <div className="text-[10px] text-slate-400 font-medium hidden sm:block">
-                    Kuis Realtime Mahasiswa & Dosen
+                    Platform Kuis Realtime Interaktif
                   </div>
                 </div>
               </button>
@@ -230,7 +230,7 @@ export const Navbar: React.FC = () => {
                         {user.fullName}
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        {user.identifier ? `NIM: ${user.identifier}` : 'Set Identitas'}
+                        {user.identifier ? `ID: ${user.identifier}` : 'Set Identitas'}
                       </div>
                     </div>
                     <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:block" />

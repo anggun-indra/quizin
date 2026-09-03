@@ -58,7 +58,7 @@ export const JoinQuizModal: React.FC<JoinQuizModalProps> = ({ open, onClose, onJ
             Gabung ke Kuis
           </h2>
           <p className="text-xs text-slate-500 max-w-xs mx-auto">
-            Masukkan kode akses kuis yang diberikan oleh pengampu untuk mulai mengerjakan.
+            Masukkan kode akses kuis yang diberikan oleh pembuat kuis (host) untuk mulai mengerjakan.
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export const JoinQuizModal: React.FC<JoinQuizModalProps> = ({ open, onClose, onJ
             </span>
           </div>
           <span className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600">
-            NIM: {user?.identifier || '-'}
+            ID: {user?.identifier || '-'}
           </span>
         </div>
 
