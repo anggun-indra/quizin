@@ -31,45 +31,82 @@ const generateRandomCode = () => {
   return result;
 };
 
-// Default sample questions for quick testing (General / Technology)
+// Default sample questions: Pertemuan 03 (Internet, Search & Literasi Digital)
 const getDefaultSampleQuestions = (): Question[] => [
   {
     id: `q_${Date.now()}_1`,
     order: 1,
-    text: 'Protokol internet manakah yang digunakan untuk mengamankan komunikasi data melalui enkripsi TLS/SSL?',
+    text: 'Ketika pengguna mengetik kata kunci di Google, mesin pencari pada dasarnya akan mencari informasi dari ...',
     type: 'SINGLE_CHOICE',
     points: 20,
     options: [
-      { id: 'opt_1', text: 'HTTP' },
-      { id: 'opt_2', text: 'HTTPS' },
-      { id: 'opt_3', text: 'FTP' },
-      { id: 'opt_4', text: 'SMTP' },
+      { id: 'opt_1', text: 'seluruh internet secara langsung pada saat tombol Enter ditekan' },
+      { id: 'opt_2', text: 'indeks halaman web yang sebelumnya telah dikumpulkan oleh mesin pencari' },
+      { id: 'opt_3', text: 'hanya situs yang berada di halaman pertama Google' },
+      { id: 'opt_4', text: 'database milik pemerintah dan institusi pendidikan' },
     ],
     correctAnswers: ['opt_2'],
-    explanation: 'HTTPS (Hypertext Transfer Protocol Secure) menggunakan enkripsi TLS/SSL untuk mengamankan pertukaran data di internet.',
+    explanation: 'Search engine bekerja menggunakan indeks yang sebelumnya telah dikumpulkan dan disusun oleh web crawler, bukan menjelajahi seluruh internet secara langsung pada saat tombol Enter ditekan.',
   },
   {
     id: `q_${Date.now()}_2`,
     order: 2,
-    text: 'Dalam komputasi awan (Cloud Computing), SaaS merupakan singkatan dari "Software as a Service".',
-    type: 'TRUE_FALSE',
+    text: 'Seorang mahasiswa ingin mencari laporan resmi Bank Indonesia dalam format PDF tentang pembayaran digital pada periode 2024–2025. Query yang paling efektif adalah ...',
+    type: 'SINGLE_CHOICE',
     points: 20,
     options: [
-      { id: 'opt_t', text: 'Benar' },
-      { id: 'opt_f', text: 'Salah' },
+      { id: 'opt_1', text: 'pembayaran digital Indonesia' },
+      { id: 'opt_2', text: '"pembayaran digital" 2024 2025' },
+      { id: 'opt_3', text: 'site:bi.go.id filetype:pdf "pembayaran digital" 2024..2025' },
+      { id: 'opt_4', text: 'pembayaran digital OR Bank Indonesia' },
     ],
-    correctAnswers: ['opt_t'],
-    explanation: 'Benar. SaaS adalah model layanan cloud di mana perangkat lunak diakses melalui internet tanpa instalasi lokal.',
+    correctAnswers: ['opt_3'],
+    explanation: 'Operator site:bi.go.id membatasi domain ke situs resmi Bank Indonesia, filetype:pdf membatasi format PDF, tanda kutip mencari frase persis, dan 2024..2025 menentukan rentang tahun.',
   },
   {
     id: `q_${Date.now()}_3`,
     order: 3,
-    text: 'Format data pertukaran teks terbuka yang paling populer dan ringan berbasis pasangan key-value adalah...',
-    type: 'SHORT_ANSWER',
+    text: 'Seorang mahasiswa menemukan klaim bahwa “90% masyarakat Indonesia sudah menggunakan pembayaran digital.” Ia kemudian mencari sumber asli yang pertama kali menerbitkan angka tersebut dan memeriksa konteks sampelnya. Langkah SIFT yang sedang dilakukan adalah ...',
+    type: 'SINGLE_CHOICE',
     points: 20,
-    options: [],
-    correctAnswers: ['json', 'javascript object notation'],
-    explanation: 'JSON (JavaScript Object Notation) adalah format pertukaran data standar yang ringkas dan mudah dibaca manusia serta mesin.',
+    options: [
+      { id: 'opt_1', text: 'Stop' },
+      { id: 'opt_2', text: 'Investigate the Source' },
+      { id: 'opt_3', text: 'Find Better Coverage' },
+      { id: 'opt_4', text: 'Trace Claims' },
+    ],
+    correctAnswers: ['opt_4'],
+    explanation: 'Langkah SIFT yang dilakukan adalah Trace Claims (melacak klaim, kutipan, dan media ke sumber asli serta konteks aslinya).',
+  },
+  {
+    id: `q_${Date.now()}_4`,
+    order: 4,
+    text: 'Sebuah laporan industri menyebutkan bahwa penggunaan dompet digital sangat tinggi di Indonesia. Sebelum menggunakan laporan tersebut, mahasiswa memeriksa wilayah survei, periode penelitian, jumlah responden, dan karakteristik sampel. Dalam AACODS, aspek yang sedang diperiksa terutama adalah ...',
+    type: 'SINGLE_CHOICE',
+    points: 20,
+    options: [
+      { id: 'opt_1', text: 'Authority' },
+      { id: 'opt_2', text: 'Coverage' },
+      { id: 'opt_3', text: 'Objectivity' },
+      { id: 'opt_4', text: 'Significance' },
+    ],
+    correctAnswers: ['opt_2'],
+    explanation: 'Dalam metode evaluasi AACODS, Coverage (cakupan) menilai batasan penelitian, wilayah survei, periode waktu, jumlah responden, dan karakteristik sampel yang digunakan.',
+  },
+  {
+    id: `q_${Date.now()}_5`,
+    order: 5,
+    text: 'Mahasiswa menemukan dua sumber kredibel yang memberikan angka berbeda mengenai suatu tren bisnis. Tindakan yang paling tepat sesuai materi perkuliahan adalah ...',
+    type: 'SINGLE_CHOICE',
+    points: 20,
+    options: [
+      { id: 'opt_1', text: 'memilih angka yang paling tinggi karena lebih menarik untuk laporan' },
+      { id: 'opt_2', text: 'memilih sumber yang muncul paling atas di Google' },
+      { id: 'opt_3', text: 'membandingkan definisi, periode, populasi, dan metode kedua sumber serta mencari sumber ketiga sebagai pembanding' },
+      { id: 'opt_4', text: 'meminta AI menentukan sumber mana yang benar tanpa membuka dokumen aslinya' },
+    ],
+    correctAnswers: ['opt_3'],
+    explanation: 'Triangulasi sumber dilakukan dengan membandingkan definisi, periode, populasi, dan metodologi dari kedua sumber, serta mencari sumber ketiga yang kredibel sebagai pembanding objektif.',
   },
 ];
 
@@ -171,7 +208,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Contoh: Kuis Pengetahuan Umum / Workshop & Pelatihan"
+              placeholder="Contoh: Aplikasi Komputer — Pertemuan 03"
               size="large"
               className="rounded-xl font-semibold text-sm"
             />
@@ -187,7 +224,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
               <Input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Contoh: Teknologi / Pengetahuan Umum"
+                placeholder="Contoh: Internet, Search & Literasi Digital"
                 size="large"
                 className="rounded-xl font-medium text-sm"
               />
@@ -225,7 +262,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Contoh: Jawablah pertanyaan berikut dengan teliti. Selamat mengerjakan!"
+              placeholder="Contoh: Jawablah pertanyaan pilihan ganda berikut dengan teliti. Selamat mengerjakan!"
               className="rounded-xl text-xs"
             />
           </div>
@@ -304,7 +341,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({ open, onClose,
             {/* Include Samples checkbox */}
             <div className="pt-1 flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-700">
-                Sertakan 3 Contoh Soal Siap Pakai (Bisa diedit kapan saja)
+                Sertakan 5 Soal Pertemuan 03 Siap Pakai (Bisa diedit kapan saja)
               </span>
               <Switch checked={includeSamples} onChange={setIncludeSamples} size="small" />
             </div>
