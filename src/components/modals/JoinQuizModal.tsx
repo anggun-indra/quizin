@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Input, Button, message } from 'antd';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuiz } from '@/contexts/QuizContext';
-import { LogIn, KeyRound, User } from 'lucide-react';
+import { LogIn, KeyRound, User, Sparkles } from 'lucide-react';
 
 interface JoinQuizModalProps {
   open: boolean;
@@ -48,46 +48,48 @@ export const JoinQuizModal: React.FC<JoinQuizModalProps> = ({ open, onClose, onJ
       width={440}
       className="join-quiz-modal"
     >
-      <div className="pt-2 pb-1 space-y-6">
-        {/* Header */}
+      <div className="pt-2 pb-1 space-y-5">
+        {/* Header - Centered & proportioned icon */}
         <div className="text-center space-y-2">
-          <div className="w-13 h-13 rounded-2xl bg-slate-900 text-white mx-auto flex items-center justify-center shadow-md">
-            <LogIn className="w-6 h-6" />
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-900 text-white mx-auto flex items-center justify-center shadow-md shadow-slate-900/10">
+            <LogIn className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">
             Gabung ke Kuis
           </h2>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
             Masukkan kode akses kuis yang diberikan oleh pembuat kuis (host) untuk mulai mengerjakan.
           </p>
         </div>
 
         {/* User Identity Preview */}
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-2">
-            <User className="w-4 h-4 text-indigo-600" />
-            <span className="font-semibold text-slate-700 truncate max-w-[160px]">
+          <div className="flex items-center space-x-2 overflow-hidden">
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+              <User className="w-4 h-4" />
+            </div>
+            <span className="font-semibold text-slate-700 truncate max-w-[170px]">
               {user?.fullName}
             </span>
           </div>
-          <span className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600">
+          <span className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 flex-shrink-0">
             ID: {user?.identifier || '-'}
           </span>
         </div>
 
         {/* Input Code */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <label className="block text-xs font-bold text-slate-700 flex items-center">
-            <KeyRound className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
-            Kode Akses Kuis
+            <KeyRound className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+            <span>Kode Akses Kuis</span>
           </label>
           <Input
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             onPressEnter={handleJoin}
-            placeholder="Contoh: QZ-8492"
+            placeholder="Contoh: QZ-BJRJ"
             size="large"
-            className="rounded-xl text-center font-mono font-black text-lg text-indigo-700 tracking-widest uppercase h-13"
+            className="rounded-xl text-center font-mono font-black text-lg text-indigo-700 tracking-widest uppercase h-12"
             autoFocus
           />
         </div>

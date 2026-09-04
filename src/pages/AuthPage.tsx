@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Sparkles, Award, CheckCircle2, BookOpen, Clock, BarChart3 } from 'lucide-react';
+import { Sparkles, Award, CheckCircle2, Clock, BarChart3 } from 'lucide-react';
 import { Button } from 'antd';
 
 export const AuthPage: React.FC = () => {
@@ -36,10 +36,10 @@ export const AuthPage: React.FC = () => {
       {/* Main Authentication Card */}
       <div className="max-w-md mx-auto w-full py-4 sm:py-6">
         <div className="bg-white rounded-3xl border border-slate-300 shadow-sm p-6 sm:p-10 space-y-6 sm:space-y-8 text-center">
-          {/* Header Icon */}
+          {/* Header Icon - Beautifully centered & sized on mobile & desktop */}
           <div className="space-y-2.5 sm:space-y-3">
-            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/20">
-              <Award className="w-7 h-7" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-md shadow-indigo-600/20">
+              <Award className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
 
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">

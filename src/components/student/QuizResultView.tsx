@@ -11,9 +11,11 @@ import {
   Clock, 
   ArrowLeft, 
   BookOpen, 
-  RotateCcw,
   Sparkles,
-  Users
+  Users,
+  BarChart3,
+  Check,
+  ChevronRight
 } from 'lucide-react';
 import { Button, Tag } from 'antd';
 
@@ -22,11 +24,13 @@ interface QuizResultViewProps {
   onBackToDashboard: () => void;
 }
 
+type ResultTab = 'summary' | 'review' | 'leaderboard';
+
 export const QuizResultView: React.FC<QuizResultViewProps> = ({ quiz, onBackToDashboard }) => {
   const { user } = useAuth();
   const { activeSubmission } = useQuiz();
 
-  const [activeTab, setActiveTab] = useState<'review' | 'leaderboard'>('review');
+  const [activeTab, setActiveTab] = useState<ResultTab>('summary');
 
   if (!user) return null;
 
@@ -54,147 +58,228 @@ export const QuizResultView: React.FC<QuizResultViewProps> = ({ quiz, onBackToDa
 
   const myRank = sortedParticipants.findIndex((p) => p.uid === user.uid) + 1;
   const submission = activeSubmission;
+  const totalCorrect = myParticipant?.totalCorrect ?? submission?.totalCorrect ?? 0;
+  const totalIncorrect = myParticipant?.totalIncorrect ?? submission?.totalIncorrect ?? 0;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-3 sm:space-y-6 py-2 sm:py-6">
-      {/* Top Main Result Card */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-5 sm:space-y-6 text-center">
-        {/* Back button */}
-        <div className="flex items-center justify-between">
+    <div className="max-w-4xl mx-auto space-y-3 sm:space-y-4 py-2 sm:py-6 pb-24 sm:pb-8">
+      {/* Top Header & Desktop Segmented Tabs */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Left: Quiz Info & Back Button */}
+        <div className="flex items-center space-x-2.5 overflow-hidden">
           <Button
             size="middle"
             onClick={onBackToDashboard}
-            className="rounded-xl font-bold text-xs flex items-center"
+            className="rounded-xl font-bold text-xs flex items-center h-9 px-3 flex-shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-            <span>Ke Beranda</span>
+            <span className="hidden sm:inline">Ke Beranda</span>
+            <span className="sm:hidden">Keluar</span>
           </Button>
 
-          <Tag color="purple" className="font-bold text-[10px] m-0">
-            {quiz.code}
-          </Tag>
-        </div>
-
-        {/* Score & Badge */}
-        <div className="space-y-2">
-          <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 mx-auto flex items-center justify-center">
-            {isPassed ? (
-              <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500" />
-            ) : (
-              <Award className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600" />
-            )}
-          </div>
-
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-            {quiz.title}
-          </h1>
-
-          <p className="text-xs sm:text-sm text-slate-500">
-            Hasil Pengerjaan Anda Telah Berhasil Dikumpulkan
-          </p>
-        </div>
-
-        {/* Big Score Box */}
-        <div className="max-w-xs sm:max-w-sm mx-auto p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-slate-50 border border-slate-200 space-y-2">
-          <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Skor Akhir
-          </div>
-          <div className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-indigo-600">
-            {percentage}
-            <span className="text-xl sm:text-2xl text-slate-400 font-sans font-bold"> / 100</span>
-          </div>
-
-          <div>
-            {isPassed ? (
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                LULUS (Target: {quiz.settings.passingScore})
-              </span>
-            ) : (
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 font-bold text-xs">
-                <XCircle className="w-3.5 h-3.5 mr-1.5" />
-                BELUM LULUS (Target: {quiz.settings.passingScore})
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-center">
-          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="text-[10px] text-slate-400 font-bold uppercase">Peringkat</div>
-            <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-              {myRank > 0 ? `#${myRank}` : '-'}
-            </div>
-          </div>
-
-          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="text-[10px] text-slate-400 font-bold uppercase">Waktu Pengerjaan</div>
-            <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-              {formatTime(myParticipant?.timeSpentSeconds)}
-            </div>
-          </div>
-
-          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="text-[10px] text-slate-400 font-bold uppercase">Jawaban Benar</div>
-            <div className="text-base sm:text-lg font-black text-emerald-600 mt-0.5">
-              {myParticipant?.totalCorrect ?? submission?.totalCorrect ?? 0}
-            </div>
-          </div>
-
-          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="text-[10px] text-slate-400 font-bold uppercase">Jawaban Salah</div>
-            <div className="text-base sm:text-lg font-black text-red-500 mt-0.5">
-              {myParticipant?.totalIncorrect ?? submission?.totalIncorrect ?? 0}
+          <div className="overflow-hidden">
+            <h1 className="text-xs sm:text-sm font-black text-slate-900 truncate">
+              {quiz.title}
+            </h1>
+            <div className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] text-slate-400">
+              <span className="font-mono font-bold text-indigo-600">{quiz.code}</span>
+              <span>•</span>
+              <span>Nilai: <strong className="text-slate-700 font-bold">{percentage}/100</strong></span>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
+        {/* Right: Desktop Tabs Bar (Hidden on Mobile) */}
+        <div className="hidden sm:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+          <button
+            type="button"
+            onClick={() => setActiveTab('summary')}
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 ${
+              activeTab === 'summary'
+                ? 'bg-indigo-600 text-white shadow-sm font-extrabold'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Ringkasan Nilai</span>
+          </button>
+
           {quiz.settings.showAnswerDiscussion && (
-            <Button
-              type={activeTab === 'review' ? 'primary' : 'default'}
-              size="middle"
+            <button
+              type="button"
               onClick={() => setActiveTab('review')}
-              className={`h-10 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 ${
-                activeTab === 'review' ? 'bg-indigo-600' : ''
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 ${
+                activeTab === 'review'
+                  ? 'bg-indigo-600 text-white shadow-sm font-extrabold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Pembahasan & Kunci Jawaban</span>
-            </Button>
+              <span>Pembahasan & Kunci</span>
+            </button>
           )}
 
-          <Button
-            type={activeTab === 'leaderboard' ? 'primary' : 'default'}
-            size="middle"
+          <button
+            type="button"
             onClick={() => setActiveTab('leaderboard')}
-            className={`h-10 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 ${
-              activeTab === 'leaderboard' ? 'bg-indigo-600' : ''
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 ${
+              activeTab === 'leaderboard'
+                ? 'bg-indigo-600 text-white shadow-sm font-extrabold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Trophy className="w-3.5 h-3.5 text-amber-500" />
-            <span>Papan Skor (Leaderboard)</span>
-          </Button>
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <span>Papan Peringkat</span>
+          </button>
         </div>
       </div>
 
-      {/* Tab: Question Review & Discussion */}
-      {activeTab === 'review' && quiz.settings.showAnswerDiscussion && (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
-              <h2 className="text-sm sm:text-base font-black text-slate-900">
-                Review & Pembahasan Soal
-              </h2>
+      {/* ========================================================================= */}
+      {/* TAB 1: SUMMARY (RINGKASAN NILAI) */}
+      {/* ========================================================================= */}
+      {activeTab === 'summary' && (
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-5 sm:space-y-6 text-center">
+          {/* Trophy / Award Icon */}
+          <div className="space-y-2">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 mx-auto flex items-center justify-center shadow-sm">
+              {isPassed ? (
+                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
+              ) : (
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
+              )}
             </div>
-            <span className="text-xs font-bold text-slate-400">
-              Total {quiz.questions.length} Butir Soal
-            </span>
+
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              {isPassed ? 'Selamat, Anda Lulus!' : 'Hasil Pengerjaan Kuis'}
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
+              {isPassed 
+                ? 'Nilai Anda telah memenuhi target skor minimum kelulusan kuis.'
+                : 'Tetap semangat! Anda dapat mempelajari kembali pembahasan soal di bawah ini.'}
+            </p>
           </div>
 
+          {/* Big Score Box */}
+          <div className="max-w-xs sm:max-w-sm mx-auto p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Skor Akhir Anda
+            </div>
+            <div className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-indigo-600">
+              {percentage}
+              <span className="text-xl sm:text-2xl text-slate-400 font-sans font-bold"> / 100</span>
+            </div>
+
+            <div>
+              {isPassed ? (
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                  LULUS (Target KKM: {quiz.settings.passingScore})
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 font-bold text-xs">
+                  <XCircle className="w-3.5 h-3.5 mr-1.5" />
+                  BELUM LULUS (Target KKM: {quiz.settings.passingScore})
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center">
+            <div className="p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-400 font-bold uppercase">Peringkat</div>
+              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                {myRank > 0 ? `#${myRank}` : '-'}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-400 font-bold uppercase">Waktu Pengerjaan</div>
+              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                {formatTime(myParticipant?.timeSpentSeconds)}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-400 font-bold uppercase">Jawaban Benar</div>
+              <div className="text-base sm:text-lg font-black text-emerald-600 mt-0.5">
+                {totalCorrect}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-400 font-bold uppercase">Jawaban Salah</div>
+              <div className="text-base sm:text-lg font-black text-red-500 mt-0.5">
+                {totalIncorrect}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Action Buttons to Switch Tabs */}
+          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5">
+            {quiz.settings.showAnswerDiscussion && (
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => setActiveTab('review')}
+                className="h-11 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white border-0 flex items-center justify-center space-x-1.5 shadow-sm"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Lihat Pembahasan Soal</span>
+                <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+              </Button>
+            )}
+
+            <Button
+              size="large"
+              onClick={() => setActiveTab('leaderboard')}
+              className="h-11 rounded-xl font-bold text-xs bg-white border border-slate-300 hover:border-indigo-600 text-slate-700 flex items-center justify-center space-x-1.5 shadow-sm"
+            >
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <span>Lihat Papan Peringkat</span>
+              <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 2: REVIEW (PEMBAHASAN SOAL & KUNCI JAWABAN) */}
+      {/* ========================================================================= */}
+      {activeTab === 'review' && quiz.settings.showAnswerDiscussion && (
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-sm space-y-4">
+          {/* Header Strip with Score Recap */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-black text-slate-900 leading-tight">
+                  Pembahasan & Kunci Jawaban
+                </h2>
+                <span className="text-[11px] text-slate-400">
+                  Total {quiz.questions.length} Butir Pertanyaan
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Score Chips */}
+            <div className="flex items-center space-x-1.5 self-start sm:self-auto">
+              <Tag color="purple" className="font-mono font-bold text-xs m-0">
+                Skor: {percentage}/100
+              </Tag>
+              <Tag color="green" className="font-bold text-xs m-0">
+                {totalCorrect} Benar
+              </Tag>
+              <Tag color="red" className="font-bold text-xs m-0">
+                {totalIncorrect} Salah
+              </Tag>
+            </div>
+          </div>
+
+          {/* Question Review Cards */}
           <div className="space-y-3 sm:space-y-4">
             {quiz.questions.map((q, idx) => {
               const res = submission?.questionResults[q.id];
@@ -303,82 +388,161 @@ export const QuizResultView: React.FC<QuizResultViewProps> = ({ quiz, onBackToDa
         </div>
       )}
 
-      {/* Tab: Leaderboard */}
+      {/* ========================================================================= */}
+      {/* TAB 3: LEADERBOARD (PAPAN PERINGKAT REALTIME) */}
+      {/* ========================================================================= */}
       {activeTab === 'leaderboard' && (
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          {/* Header Strip */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
             <div className="flex items-center space-x-2">
-              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-              <h2 className="text-sm sm:text-base font-black text-slate-900">
-                Papan Peringkat Realtime
-              </h2>
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center flex-shrink-0">
+                <Trophy className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-black text-slate-900 leading-tight">
+                  Papan Peringkat Realtime
+                </h2>
+                <span className="text-[11px] text-slate-400">
+                  {sortedParticipants.length} Peserta Telah Mengumpulkan Kuis
+                </span>
+              </div>
             </div>
-            <span className="text-xs font-bold text-slate-400">
-              {sortedParticipants.length} Peserta Telah Submit
-            </span>
+
+            {myRank > 0 && (
+              <Tag color="gold" className="font-bold text-xs self-start sm:self-auto m-0">
+                Peringkat Anda: #{myRank} ({percentage} Poin)
+              </Tag>
+            )}
           </div>
 
+          {/* Participants Ranking List */}
           <div className="space-y-2">
-            {sortedParticipants.map((p, idx) => {
-              const rank = idx + 1;
-              const isMe = p.uid === user.uid;
+            {sortedParticipants.length === 0 ? (
+              <div className="text-center py-12 text-slate-400 text-xs">
+                Belum ada peserta yang mengumpulkan jawaban kuis.
+              </div>
+            ) : (
+              sortedParticipants.map((p, idx) => {
+                const rank = idx + 1;
+                const isMe = p.uid === user.uid;
 
-              return (
-                <div
-                  key={p.uid}
-                  className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center justify-between space-x-3 transition-all ${
-                    isMe
-                      ? 'border-indigo-600 bg-indigo-50/70 font-bold shadow-sm'
-                      : rank === 1
-                      ? 'border-amber-300 bg-amber-50/40'
-                      : 'border-slate-200 bg-slate-50/50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3 overflow-hidden">
-                    <span
-                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm flex-shrink-0 ${
-                        rank === 1
-                          ? 'bg-amber-400 text-amber-950 shadow-sm'
-                          : rank === 2
-                          ? 'bg-slate-300 text-slate-800'
-                          : rank === 3
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-white border border-slate-200 text-slate-600'
-                      }`}
-                    >
-                      {rank}
-                    </span>
+                return (
+                  <div
+                    key={p.uid}
+                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center justify-between space-x-3 transition-all ${
+                      isMe
+                        ? 'border-indigo-600 bg-indigo-50/80 font-bold shadow-sm ring-1 ring-indigo-600'
+                        : rank === 1
+                        ? 'border-amber-300 bg-amber-50/40'
+                        : 'border-slate-200 bg-slate-50/50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2.5 sm:space-x-3 overflow-hidden">
+                      <span
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm flex-shrink-0 ${
+                          rank === 1
+                            ? 'bg-amber-400 text-amber-950 shadow-sm'
+                            : rank === 2
+                            ? 'bg-slate-300 text-slate-800'
+                            : rank === 3
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-white border border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {rank}
+                      </span>
 
-                    <img
-                      src={p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.uid}`}
-                      alt=""
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-200 bg-white flex-shrink-0"
-                    />
+                      <img
+                        src={p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.uid}`}
+                        alt=""
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-200 bg-white flex-shrink-0"
+                      />
 
-                    <div className="overflow-hidden">
-                      <div className="text-xs sm:text-sm font-bold text-slate-800 truncate">
-                        {p.fullName} {isMe && '(Anda)'}
+                      <div className="overflow-hidden">
+                        <div className="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                          {p.fullName} {isMe && '(Anda)'}
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono">
+                          ID: {p.identifier}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm sm:text-base font-mono font-black text-indigo-700">
+                        {p.score ?? 0} Poin
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        ID: {p.identifier}
+                        {formatTime(p.timeSpentSeconds)}
                       </div>
                     </div>
                   </div>
-
-                  <div className="text-right flex-shrink-0">
-                    <div className="text-sm sm:text-base font-mono font-black text-indigo-700">
-                      {p.score ?? 0} Poin
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-mono">
-                      {formatTime(p.timeSpentSeconds)}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* MOBILE FIXED BOTTOM NAVIGATION BAR */}
+      {/* ========================================================================= */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe">
+        {/* Tab 1: Summary */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('summary')}
+          className={`flex flex-col items-center space-y-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'summary'
+              ? 'text-indigo-600 font-extrabold'
+              : 'text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          <Award className={`w-5 h-5 ${activeTab === 'summary' ? 'text-indigo-600 stroke-[2.5]' : ''}`} />
+          <span className="text-[10px] tracking-tight">Ringkasan</span>
+        </button>
+
+        {/* Tab 2: Review (Pembahasan) */}
+        {quiz.settings.showAnswerDiscussion && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('review')}
+            className={`flex flex-col items-center space-y-0.5 py-1 px-2.5 rounded-xl transition-all ${
+              activeTab === 'review'
+                ? 'text-indigo-600 font-extrabold'
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            <BookOpen className={`w-5 h-5 ${activeTab === 'review' ? 'text-indigo-600 stroke-[2.5]' : ''}`} />
+            <span className="text-[10px] tracking-tight">Pembahasan</span>
+          </button>
+        )}
+
+        {/* Tab 3: Leaderboard (Peringkat) */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('leaderboard')}
+          className={`flex flex-col items-center space-y-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'leaderboard'
+              ? 'text-indigo-600 font-extrabold'
+              : 'text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          <Trophy className={`w-5 h-5 ${activeTab === 'leaderboard' ? 'text-indigo-600 stroke-[2.5]' : ''}`} />
+          <span className="text-[10px] tracking-tight">Peringkat</span>
+        </button>
+
+        {/* Action: Exit / Back to Home */}
+        <button
+          type="button"
+          onClick={onBackToDashboard}
+          className="flex flex-col items-center space-y-0.5 py-1 px-2.5 rounded-xl text-slate-400 hover:text-slate-700 transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-[10px] tracking-tight">Beranda</span>
+        </button>
+      </div>
     </div>
   );
 };

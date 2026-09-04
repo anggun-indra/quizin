@@ -331,7 +331,7 @@ export const Dashboard: React.FC = () => {
                         </Tag>
                       ) : isDone ? (
                         <Tag color="green" className="font-black text-[10px] m-0">
-                          {myParticipant?.percentage}/100
+                          <span className="inline-flex items-center"><Award className="w-3 h-3 mr-1 text-emerald-600" />{myParticipant?.percentage}/100</span>
                         </Tag>
                       ) : (
                         <span className="text-indigo-600 font-bold text-[11px] flex items-center group-hover:translate-x-0.5 transition-transform">

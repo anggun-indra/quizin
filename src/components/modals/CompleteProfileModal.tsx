@@ -71,8 +71,8 @@ export const CompleteProfileModal: React.FC<CompleteProfileModalProps> = ({
       <div className="pt-2 pb-1 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-md">
-            <Award className="w-7 h-7" />
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-md shadow-indigo-600/20">
+            <Award className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">
             Lengkapi Identitas Pengguna

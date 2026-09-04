@@ -31,7 +31,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
     <div className="max-w-4xl mx-auto space-y-3 sm:space-y-6 py-2 sm:py-6">
       {/* Top Banner */}
       <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-6 text-center">
-        <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/20">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/20">
           <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
 

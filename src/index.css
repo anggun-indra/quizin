@@ -31,6 +31,11 @@
   }
 }
 
+/* Safe area for mobile navigation bars */
+.pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* Hide scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
