@@ -87,7 +87,7 @@ export const JoinQuizModal: React.FC<JoinQuizModalProps> = ({ open, onClose, onJ
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             onPressEnter={handleJoin}
-            placeholder="Contoh: QZ-BJRJ"
+            placeholder="Contoh: QZ-8821"
             size="large"
             className="rounded-xl text-center font-mono font-black text-lg text-indigo-700 tracking-widest uppercase h-12"
             autoFocus
