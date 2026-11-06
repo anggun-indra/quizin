@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Quiz, QuizParticipant } from '@/types';
 import { exportQuizResultsToExcel } from '@/lib/exportExcel';
 import { SubmissionDetailModal } from '@/components/admin/SubmissionDetailModal';
+import { db, collection, getDocs } from '@/lib/firebase';
 import { 
   Trophy, 
   Download, 
@@ -23,8 +24,37 @@ interface QuizLeaderboardProps {
 export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [inspectParticipant, setInspectParticipant] = useState<QuizParticipant | null>(null);
+  const [usersMap, setUsersMap] = useState<Record<string, { identifier?: string; fullName?: string }>>({});
+
+  useEffect(() => {
+    if (!db || !db.app) return;
+    const loadUsers = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const map: Record<string, { identifier?: string; fullName?: string }> = {};
+        snap.forEach((d) => {
+          map[d.id] = d.data();
+        });
+        setUsersMap(map);
+      } catch (err) {
+        console.warn('Load users map in leaderboard note:', err);
+      }
+    };
+    loadUsers();
+  }, []);
 
   const participants = quiz.participants || [];
+
+  const getResolvedIdentifier = (p: QuizParticipant) => {
+    if (p.identifier && p.identifier !== 'N/A' && p.identifier.trim().length > 0) {
+      return p.identifier;
+    }
+    const userInDb = usersMap[p.uid];
+    if (userInDb?.identifier && userInDb.identifier !== 'N/A') {
+      return userInDb.identifier;
+    }
+    return p.identifier || 'N/A';
+  };
 
   // Sort: Submitted first sorted by score descending, then by timeSpent ascending
   const sortedParticipants = [...participants].sort((a, b) => {
@@ -39,9 +69,10 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
   // Filter
   const filteredParticipants = sortedParticipants.filter((p) => {
     const q = searchQuery.toLowerCase();
+    const id = getResolvedIdentifier(p).toLowerCase();
     return (
       p.fullName.toLowerCase().includes(q) ||
-      p.identifier.toLowerCase().includes(q) ||
+      id.includes(q) ||
       p.email.toLowerCase().includes(q)
     );
   });
@@ -134,7 +165,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
 
           <Button
             type="primary"
-            onClick={() => exportQuizResultsToExcel(quiz)}
+            onClick={() => exportQuizResultsToExcel(quiz, usersMap)}
             disabled={participants.length === 0}
             className="w-full sm:w-auto h-10 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0 flex items-center justify-center space-x-2 shadow-sm"
           >
@@ -213,7 +244,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
                               {p.fullName}
                             </div>
                             <div className="text-[11px] font-mono text-slate-500 mt-0.5">
-                              {p.identifier}
+                              {getResolvedIdentifier(p)}
                             </div>
                           </div>
                         </div>
@@ -283,7 +314,7 @@ export const QuizLeaderboard: React.FC<QuizLeaderboardProps> = ({ quiz }) => {
                       <td className="py-3 px-3 text-right">
                         <Button
                           size="small"
-                          onClick={() => setInspectParticipant(p)}
+                          onClick={() => setInspectParticipant({ ...p, identifier: getResolvedIdentifier(p) })}
                           disabled={!isSubmitted}
                           className="rounded-lg text-xs font-semibold flex items-center ml-auto"
                         >

@@ -148,7 +148,7 @@ export const QuizLobby: React.FC<QuizLobbyProps> = ({ quiz, onStart }) => {
                     {p.fullName} {isMe && '(Anda)'}
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono truncate">
-                    ID: {p.identifier}
+                    ID: {isMe ? (user.identifier || p.identifier) : p.identifier}
                   </div>
                 </div>
               </div>

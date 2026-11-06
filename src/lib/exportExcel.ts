@@ -1,7 +1,10 @@
 import * as XLSX from 'xlsx';
 import { Quiz } from '@/types';
 
-export const exportQuizResultsToExcel = (quiz: Quiz) => {
+export const exportQuizResultsToExcel = (
+  quiz: Quiz,
+  usersMap?: Record<string, { identifier?: string }>
+) => {
   // Sort participants by percentage/score descending
   const sortedParticipants = [...quiz.participants].sort((a, b) => {
     const scoreA = a.score || 0;
@@ -15,9 +18,13 @@ export const exportQuizResultsToExcel = (quiz: Quiz) => {
       ? `${Math.floor(p.timeSpentSeconds / 60)}m ${p.timeSpentSeconds % 60}s`
       : '-';
 
+    const resolvedId = (p.identifier && p.identifier !== 'N/A')
+      ? p.identifier
+      : usersMap?.[p.uid]?.identifier || p.identifier || '-';
+
     return {
       'Peringkat': index + 1,
-      'ID / NIM': p.identifier,
+      'ID / NIM': resolvedId,
       'Nama Lengkap': p.fullName,
       'Email': p.email,
       'Status': p.status === 'SUBMITTED' ? 'Selesai' : p.status === 'IN_PROGRESS' ? 'Mengerjakan' : 'Hadir',

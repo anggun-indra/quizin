@@ -24,6 +24,7 @@ import {
 } from '@/lib/firebase';
 import { message } from 'antd';
 import confetti from 'canvas-confetti';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface QuizContextType {
   quizzes: Quiz[];
@@ -65,6 +66,8 @@ interface QuizContextType {
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
     try {
       const saved = localStorage.getItem('quizin_cached_quizzes');
@@ -151,6 +154,36 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const activeQuiz = quizzes.find((q) => q.id === activeQuizId) || null;
+
+  // Auto-heal / synchronize participant identifier in activeQuiz when user profile has a valid NIM
+  useEffect(() => {
+    if (!activeQuiz || !user || !user.uid || !user.identifier || user.identifier === 'N/A') return;
+
+    const myParticipant = activeQuiz.participants.find((p) => p.uid === user.uid);
+    if (
+      myParticipant &&
+      (!myParticipant.identifier || myParticipant.identifier === 'N/A' || myParticipant.identifier !== user.identifier)
+    ) {
+      const updatedParticipants = activeQuiz.participants.map((p) => {
+        if (p.uid === user.uid) {
+          return {
+            ...p,
+            fullName: user.fullName || p.fullName,
+            identifier: user.identifier!,
+            avatarUrl: user.avatarUrl || p.avatarUrl,
+          };
+        }
+        return p;
+      });
+
+      if (db && db.app) {
+        setDoc(doc(db, 'quizzes', activeQuiz.id), { participants: updatedParticipants }, { merge: true }).catch(console.warn);
+      }
+      setQuizzes((prev) =>
+        prev.map((q) => (q.id === activeQuiz.id ? { ...q, participants: updatedParticipants } : q))
+      );
+    }
+  }, [activeQuiz?.id, activeQuiz?.participants, user?.identifier, user?.fullName]);
 
   const selectQuiz = (quiz: Quiz | null) => {
     setActiveQuizId(quiz ? quiz.id : null);
@@ -427,19 +460,30 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let updatedParticipants: QuizParticipant[];
 
     if (existingIndex >= 0) {
-      // Already joined, keep existing status
+      // Already joined, keep existing status & refresh identifier if available
+      const existing = targetQuiz.participants[existingIndex];
+      const bestIdentifier = (user.identifier && user.identifier.trim().length > 0 && user.identifier !== 'N/A')
+        ? user.identifier.trim()
+        : (existing.identifier && existing.identifier !== 'N/A')
+        ? existing.identifier
+        : 'N/A';
+
       updatedParticipants = [...targetQuiz.participants];
       updatedParticipants[existingIndex] = {
-        ...updatedParticipants[existingIndex],
-        fullName: user.fullName,
-        identifier: user.identifier || updatedParticipants[existingIndex].identifier,
-        avatarUrl: user.avatarUrl || updatedParticipants[existingIndex].avatarUrl,
+        ...existing,
+        fullName: user.fullName || existing.fullName,
+        identifier: bestIdentifier,
+        avatarUrl: user.avatarUrl || existing.avatarUrl,
       };
     } else {
       // New participant
+      const bestIdentifier = (user.identifier && user.identifier.trim().length > 0 && user.identifier !== 'N/A')
+        ? user.identifier.trim()
+        : 'N/A';
+
       const newParticipant: QuizParticipant = {
         uid: user.uid,
-        identifier: user.identifier || 'N/A',
+        identifier: bestIdentifier,
         fullName: user.fullName,
         email: user.email,
         avatarUrl: user.avatarUrl,
@@ -507,8 +551,15 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const now = new Date().toISOString();
     const updatedParticipants = targetQuiz.participants.map((p) => {
       if (p.uid === user.uid) {
+        const bestIdentifier = (user.identifier && user.identifier.trim().length > 0 && user.identifier !== 'N/A')
+          ? user.identifier.trim()
+          : (p.identifier && p.identifier !== 'N/A')
+          ? p.identifier
+          : 'N/A';
         return {
           ...p,
+          fullName: user.fullName || p.fullName,
+          identifier: bestIdentifier,
           status: 'IN_PROGRESS' as const,
           startedAt: p.startedAt || now,
         };
@@ -613,13 +664,16 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const percentage = maxTotalScore > 0 ? Math.round((earnedTotalScore / maxTotalScore) * 100) : 0;
     const now = new Date().toISOString();
     const submissionId = `${quizId}_${user.uid}`;
+    const bestIdentifier = (user.identifier && user.identifier.trim().length > 0 && user.identifier !== 'N/A')
+      ? user.identifier.trim()
+      : (targetQuiz.participants.find((p) => p.uid === user.uid)?.identifier || 'N/A');
 
     const submission: QuizSubmission = {
       id: submissionId,
       quizId,
       participantUid: user.uid,
       participantName: user.fullName,
-      participantIdentifier: user.identifier || '',
+      participantIdentifier: bestIdentifier !== 'N/A' ? bestIdentifier : (user.identifier || ''),
       participantEmail: user.email,
       answers,
       questionResults,
@@ -639,6 +693,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (p.uid === user.uid) {
         return {
           ...p,
+          fullName: user.fullName || p.fullName,
+          identifier: bestIdentifier !== 'N/A' ? bestIdentifier : (p.identifier || 'N/A'),
           status: 'SUBMITTED' as const,
           submittedAt: now,
           score: earnedTotalScore,

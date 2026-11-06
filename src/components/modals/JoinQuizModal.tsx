@@ -18,6 +18,10 @@ export const JoinQuizModal: React.FC<JoinQuizModalProps> = ({ open, onClose, onJ
 
   const handleJoin = async () => {
     if (!user) return;
+    if (!user.identifier || user.identifier.trim().length === 0 || user.identifier === 'N/A') {
+      message.warning('Harap lengkapi Nomor Identitas / NIM Anda di profil sebelum bergabung ke kuis.');
+      return;
+    }
     const cleanCode = code.trim().toUpperCase();
     if (!cleanCode) {
       message.warning('Harap masukkan kode akses kuis.');

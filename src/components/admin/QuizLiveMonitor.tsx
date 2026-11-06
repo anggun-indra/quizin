@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Quiz, QuizParticipant, QuizStatus } from '@/types';
 import { useQuiz } from '@/contexts/QuizContext';
+import { db, collection, getDocs, doc, setDoc } from '@/lib/firebase';
 import { 
   Users, 
   Play, 
@@ -38,6 +39,45 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusLoading, setStatusLoading] = useState(false);
+  const [usersMap, setUsersMap] = useState<Record<string, { identifier?: string; fullName?: string }>>({});
+
+  // Fetch users map to resolve any fallback NIMs and heal "N/A" identifiers
+  useEffect(() => {
+    if (!db || !db.app) return;
+    const loadUsers = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const map: Record<string, { identifier?: string; fullName?: string }> = {};
+        snap.forEach((d) => {
+          map[d.id] = d.data();
+        });
+        setUsersMap(map);
+
+        // Self-heal any participants in quiz where identifier is 'N/A' but real NIM exists in users
+        const pList = quiz.participants || [];
+        let hasChanges = false;
+        const healed = pList.map((p) => {
+          const userRecord = map[p.uid];
+          if ((!p.identifier || p.identifier === 'N/A') && userRecord?.identifier && userRecord.identifier !== 'N/A') {
+            hasChanges = true;
+            return {
+              ...p,
+              identifier: userRecord.identifier,
+              fullName: userRecord.fullName || p.fullName,
+            };
+          }
+          return p;
+        });
+
+        if (hasChanges) {
+          await setDoc(doc(db, 'quizzes', quiz.id), { participants: healed }, { merge: true });
+        }
+      } catch (err) {
+        console.warn('Load users map in monitor note:', err);
+      }
+    };
+    loadUsers();
+  }, [quiz.id]);
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(quiz.code);
@@ -60,10 +100,21 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
   const inProgressCount = participants.filter((p) => p.status === 'IN_PROGRESS').length;
   const submittedCount = participants.filter((p) => p.status === 'SUBMITTED').length;
 
+  const getResolvedIdentifier = (p: QuizParticipant) => {
+    if (p.identifier && p.identifier !== 'N/A' && p.identifier.trim().length > 0) {
+      return p.identifier;
+    }
+    const userInDb = usersMap[p.uid];
+    if (userInDb?.identifier && userInDb.identifier !== 'N/A') {
+      return userInDb.identifier;
+    }
+    return p.identifier || 'N/A';
+  };
+
   const filteredParticipants = participants.filter(
     (p) =>
       p.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.identifier && p.identifier.toLowerCase().includes(searchQuery.toLowerCase()))
+      getResolvedIdentifier(p).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -333,7 +384,7 @@ export const QuizLiveMonitor: React.FC<QuizLiveMonitorProps> = ({
                         {p.fullName}
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        ID: {p.identifier}
+                        ID: {getResolvedIdentifier(p)}
                       </div>
                     </div>
                   </div>

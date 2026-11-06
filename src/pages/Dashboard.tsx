@@ -42,17 +42,20 @@ export const Dashboard: React.FC = () => {
   const [isJoinOpen, setIsJoinOpen] = useState(false);
 
   // Check URL query parameters for auto join: ?code=XYZ
+  // Only auto-join after profile has a valid NIM/identifier to prevent registering as "N/A"
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const codeParam = params.get('code');
-    if (codeParam && user) {
+    const hasValidIdentifier = Boolean(user && user.identifier && user.identifier.trim().length > 0 && user.identifier !== 'N/A');
+
+    if (codeParam && user && hasValidIdentifier) {
       joinQuizByCode(codeParam, user).then((res) => {
         if (res.success && res.quiz) {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       });
     }
-  }, [user]);
+  }, [user, user?.identifier]);
 
   if (!user) return null;
 

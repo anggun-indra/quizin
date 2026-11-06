@@ -9,7 +9,9 @@ import {
   onAuthStateChanged,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  collection,
+  getDocs
 } from '@/lib/firebase';
 import { message } from 'antd';
 
@@ -199,6 +201,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (db && db.app && user.uid) {
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, updated, { merge: true });
+
+        // 3. Auto-sync updated identifier & fullName to any quiz where user is a participant
+        try {
+          const quizzesSnap = await getDocs(collection(db, 'quizzes'));
+          quizzesSnap.forEach(async (qDoc) => {
+            const qData = qDoc.data();
+            const participants = qData.participants || [];
+            let hasChanged = false;
+            const newParticipants = participants.map((p: any) => {
+              if (p.uid === user.uid && (p.identifier !== updated.identifier || p.fullName !== updated.fullName)) {
+                hasChanged = true;
+                return {
+                  ...p,
+                  fullName: updated.fullName,
+                  identifier: updated.identifier,
+                  avatarUrl: updated.avatarUrl || p.avatarUrl,
+                };
+              }
+              return p;
+            });
+            if (hasChanged) {
+              await setDoc(doc(db, 'quizzes', qDoc.id), { participants: newParticipants }, { merge: true });
+            }
+          });
+        } catch (syncErr) {
+          console.warn('Sync quizzes participant note:', syncErr);
+        }
       }
 
       message.success('Profil berhasil disimpan dan disinkronkan!');

@@ -464,7 +464,7 @@ export const QuizResultView: React.FC<QuizResultViewProps> = ({ quiz, onBackToDa
                           {p.fullName} {isMe && '(Anda)'}
                         </div>
                         <div className="text-[10px] text-slate-400 font-mono">
-                          ID: {p.identifier}
+                          ID: {isMe ? (user.identifier || p.identifier) : p.identifier}
                         </div>
                       </div>
                     </div>
